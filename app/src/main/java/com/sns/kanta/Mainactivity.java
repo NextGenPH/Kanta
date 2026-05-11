@@ -160,13 +160,13 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         setupFullscreenButton();
         setupRelatedSongs();
         refreshDisplay();
-    }    private final Runnable hideRunnable = this::hideBtnStrip;
+    }
 
     @Override
     protected void onPause() {
         super.onPause();
         savePlaybackState();
-    }
+    }    private final Runnable hideRunnable = this::hideBtnStrip;
 
     @Override
     protected void onResume() {
@@ -239,8 +239,6 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         }
     }
 
-    // ── Init ──────────────────────────────────────────────────────────────────
-
     private void bindViews() {
         youtubePlayerView = findViewById(R.id.youtubePlayerView);
         playerWrapper = findViewById(R.id.playerWrapper);
@@ -263,6 +261,8 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         txtRelatedTitle = findViewById(R.id.txtRelatedSectionTitle);
         txtNoRelated = findViewById(R.id.txtNoRelated);
     }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
 
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -324,12 +324,12 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
 
     }
 
-    // ── Playback state persistence ────────────────────────────────────────────
-
     private void persistLastPlayed(String id, String title, String channel) {
         if (id == null || id.isEmpty()) return;
         prefs.edit().putString(PREF_LAST_VIDEO, id).putString(PREF_LAST_TITLE, title).putString(PREF_LAST_CHANNEL, channel).apply();
     }
+
+    // ── Playback state persistence ────────────────────────────────────────────
 
     private void setupPlayer() {
         getLifecycle().addObserver(youtubePlayerView);
@@ -367,8 +367,6 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         });
     }
 
-    // ── Player setup ──────────────────────────────────────────────────────────
-
     private void playCurrentSong() {
         if (activePlayer == null) return;
         showLoading();
@@ -392,7 +390,7 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         checkQueueOrFallback();
     }
 
-    // ── Playback logic ────────────────────────────────────────────────────────
+    // ── Player setup ──────────────────────────────────────────────────────────
 
     private void playNext() {
         clearSavedSession();
@@ -400,6 +398,8 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         refreshDisplay();
         checkQueueOrFallback();
     }
+
+    // ── Playback logic ────────────────────────────────────────────────────────
 
     private void checkQueueOrFallback() {
         ReservationModel next = queueManager.getNowPlaying();
@@ -447,13 +447,13 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         });
     }
 
-    // ── Overlay ───────────────────────────────────────────────────────────────
-
     private void showBtnStrip() {
         isBtnStripShown = true;
         hideHandler.removeCallbacks(hideRunnable);
         hideHandler.postDelayed(hideRunnable, AUTO_HIDE_MS);
     }
+
+    // ── Overlay ───────────────────────────────────────────────────────────────
 
     private void hideBtnStrip() {
         isBtnStripShown = false;
@@ -505,8 +505,6 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         cardRelatedSongs.setVisibility(View.GONE);
     }
 
-    // ── Related songs ─────────────────────────────────────────────────────────
-
     private void loadRelatedSongs() {
         if (isPlayingFallback) {
             cardRelatedSongs.setVisibility(View.GONE);
@@ -554,6 +552,8 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         });
     }
 
+    // ── Related songs ─────────────────────────────────────────────────────────
+
     @Override
     public void onAddClick(@NonNull VideoModel video) {
         if (queueManager.isInQueue(video.getVideoId())) {
@@ -567,14 +567,12 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         Toast.makeText(this, getString(R.string.toast_added_title, formatter.formatSongTitle(video.getTitle())), Toast.LENGTH_SHORT).show();
     }
 
-    // ── RelatedSongsAdapter.OnAddClickListener ────────────────────────────────
-
     private void refreshDisplay() {
         updateNowPlaying();
         updateNextSongCard();
     }
 
-    // ── Display ───────────────────────────────────────────────────────────────
+    // ── RelatedSongsAdapter.OnAddClickListener ────────────────────────────────
 
     private void updateNowPlaying() {
         if (isPlayingFallback) {
@@ -592,15 +590,17 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         }
     }
 
+    // ── Display ───────────────────────────────────────────────────────────────
+
     private void showLoading() {
         if (loadingIndicator != null) loadingIndicator.setVisibility(View.VISIBLE);
     }
 
-    // ── Loading ───────────────────────────────────────────────────────────────
-
     private void hideLoading() {
         if (loadingIndicator != null) loadingIndicator.setVisibility(View.GONE);
     }
+
+    // ── Loading ───────────────────────────────────────────────────────────────
 
     private void setupFullscreenButton() {
         btnFullscreen.setOnClickListener(v -> {
@@ -610,13 +610,13 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         });
     }
 
-    // ── Fullscreen ────────────────────────────────────────────────────────────
-
     private void applyFullscreenState() {
         if (isFullscreen) enterFullscreen();
         else exitFullscreen();
         btnFullscreen.bringToFront();
     }
+
+    // ── Fullscreen ────────────────────────────────────────────────────────────
 
     private void enterFullscreen() {
         playerWrapper.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
@@ -709,8 +709,6 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         searchDialog.show();
     }
 
-    // ── Search ────────────────────────────────────────────────────────────────
-
     private void runSearch(String query, TextView countView, ProgressBar progress, TextView emptyView) {
         repository.fetchPage(0, query, new VideoRepository.PageCallback() {
             @Override
@@ -729,6 +727,8 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
             }
         });
     }
+
+    // ── Search ────────────────────────────────────────────────────────────────
 
     private void addToQueueFromSearch(@NonNull VideoModel video) {
         if (queueManager.isInQueue(video.getVideoId())) {
@@ -765,15 +765,13 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         }
     }
 
-    // ── Voice search ──────────────────────────────────────────────────────────
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.player_menu, menu);
         return true;
     }
 
-    // ── Menu ──────────────────────────────────────────────────────────────────
+    // ── Voice search ──────────────────────────────────────────────────────────
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -785,6 +783,8 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         else if (id == R.id.menu_help) showHelp();
         return super.onOptionsItemSelected(item);
     }
+
+    // ── Menu ──────────────────────────────────────────────────────────────────
 
     private void showQueueInfo() {
         int size = queueManager.getQueueSize();
@@ -831,13 +831,13 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
         }
     }
 
-    // ── Lifecycle ─────────────────────────────────────────────────────────────
-
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus && isFullscreen) hideSystemUI();
     }
+
+    // ── Lifecycle ─────────────────────────────────────────────────────────────
 
     @Override
     protected void onActivityResult(int req, int res, Intent data) {
@@ -858,6 +858,8 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
             Toast.makeText(this, R.string.toast_mic_denied, Toast.LENGTH_SHORT).show();
         }
     }
+
+
 
 
 }
