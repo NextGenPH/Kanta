@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Simple Gradient Background -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:endColor="#0e1117"
+                android:startColor="#161b25" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+
+    <!-- Music Note Icon -->
+    <item
+        android:width="24dp"
+        android:height="24dp"
+        android:drawable="@drawable/ic_queue_music"
+        android:gravity="center" />
+
+</layer-list>

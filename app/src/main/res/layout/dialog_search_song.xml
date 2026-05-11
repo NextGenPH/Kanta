@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1c2333"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <!-- Search row with input and mic button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputLayoutSearch"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:boxStrokeColor="#3ecf8e"
+            app:hintTextColor="#94a3b8"
+            app:startIconDrawable="@drawable/ic_search"
+            app:startIconTint="#94a3b8">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/searchInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Search song title..."
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:textColor="#e2e8f0" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Mic button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMic"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#3ecf8e"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:icon="@drawable/ic_mic"
+            app:iconGravity="textStart"
+            app:iconTint="#0a1a10" />
+
+    </LinearLayout>
+
+    <!-- Loading indicator -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:indeterminateTint="#3ecf8e"
+        android:visibility="gone" />
+
+    <!-- Results count -->
+    <TextView
+        android:id="@+id/txtResultCount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Found 0 songs"
+        android:textColor="#94a3b8"
+        android:textSize="12sp" />
+
+    <!-- Results list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerResults"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Empty state -->
+    <TextView
+        android:id="@+id/txtEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="32dp"
+        android:text="Type or speak to search for songs..."
+        android:textColor="#64748b"
+        android:textSize="13sp"
+        android:visibility="visible" />
+
+</LinearLayout>

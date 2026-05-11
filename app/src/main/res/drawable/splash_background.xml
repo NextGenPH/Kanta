@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Dark background — matches bg_primary so there's no white flash -->
+    <item>
+        <color android:color="@color/bg_primary" />
+    </item>
+
+    <!-- Centered app icon -->
+    <item
+        android:width="96dp"
+        android:height="96dp"
+        android:gravity="center">
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/app_ic" />
+    </item>
+
+</layer-list>

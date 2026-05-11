@@ -1,0 +1,62 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace 'com.sns.kanta'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.sns.kanta"
+        minSdk 24
+        targetSdk 35
+        versionCode 3
+        versionName "1.3"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "SUPABASE_ANON_KEY", "\"${SUPABASE_ANON_KEY}\""
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    buildTypes {
+        release {
+            // ✅ These work in release builds only
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable false
+        }
+
+        debug {
+            // ✅ Debug builds: NO obfuscation (easier debugging)
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+dependencies {
+    implementation libs.activity.ktx
+    implementation libs.appcompat
+    implementation libs.constraintlayout
+    implementation libs.material
+    implementation libs.swiperefreshlayout
+    implementation libs.core
+    implementation libs.retrofit
+    implementation libs.converter.gson
+    implementation libs.logging.interceptor
+    implementation libs.glide
+    annotationProcessor libs.compiler
+    testImplementation libs.junit
+    androidTestImplementation libs.espresso.core
+    androidTestImplementation libs.ext.junit
+}
