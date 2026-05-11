@@ -60,4 +60,6 @@
     <!-- Toast with title -->
     <string name="toast_added_title">Added: %1$s</string>
     <string name="label_next_up">NEXT UP</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

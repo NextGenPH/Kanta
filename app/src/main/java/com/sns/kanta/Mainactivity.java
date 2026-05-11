@@ -26,12 +26,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,6 +42,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
@@ -135,6 +138,8 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
     private boolean isBtnStripShown = false;
     private boolean isPlayingFallback = false;
     private float pendingSeekTime = 0f;
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle toggle;
 
     // ─────────────────────────────────────────────────────────────────────────
     @Override
@@ -262,9 +267,32 @@ public class Mainactivity extends AppCompatActivity implements RelatedSongsAdapt
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        }
+
+        drawerLayout = findViewById(R.id.drawerLayout);
+        toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close
+        );
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                // Handle home
+            } else if (id == R.id.nav_queue) {
+                // Show queue info
+                showQueueInfo();
+            } else if (id == R.id.nav_help) {
+                showHelp();
+            } else if (id == R.id.nav_about) {
+                // Show about dialog
+            }
+            drawerLayout.closeDrawers();
+            return true;
+        });
     }
 
     private void clearSavedSession() {

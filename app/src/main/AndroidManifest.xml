@@ -28,11 +28,11 @@
         android:theme="@style/Theme.Kanta"
         tools:ignore="GoogleAppIndexingWarning">
 
+        <!-- SplashActivity - LAUNCHER -->
         <activity
-            android:name=".Mainactivity"
+            android:name=".SplashActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="true"
-            android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Kanta.Splash">
             <intent-filter>
@@ -40,6 +40,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Mainactivity - No launcher, only opened after splash -->
+        <activity
+            android:name=".Mainactivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Kanta" />
 
     </application>
 
