@@ -1,7 +1,7 @@
 package com.sns.kanta.server;
 
-import com.sns.kanta.adapter.UpdateModel;
-import com.sns.kanta.adapter.VideoModel;
+import com.sns.kanta.model.UpdateModel;
+import com.sns.kanta.model.VideoModel;
 
 import java.util.List;
 
@@ -13,7 +13,9 @@ import retrofit2.http.Query;
 
 public interface ApiService {
 
-    // ── Videos — no filter ───────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  BASE QUERIES
+    // ═══════════════════════════════════════════════════════════════════════════
 
     @Headers("Prefer: count=exact")
     @GET("rest/v1/youtube_videos")
@@ -26,8 +28,9 @@ public interface ApiService {
             @Query("offset") int offset
     );
 
-    // ── Videos — server-side title search (ilike) ─────────────────────────────
-    // Supabase translates ?title=ilike.*term* → WHERE title ILIKE '%term%'
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  SEARCH BY TITLE
+    // ═══════════════════════════════════════════════════════════════════════════
 
     @Headers("Prefer: count=exact")
     @GET("rest/v1/youtube_videos")
@@ -35,14 +38,46 @@ public interface ApiService {
             @Header("apikey") String apiKey,
             @Header("Authorization") String auth,
             @Query("select") String select,
-            @Query("title") String titleFilter,   // "ilike.*term*"
+            @Query("title") String titleFilter,
             @Query("order") String order,
             @Query("limit") int limit,
             @Query("offset") int offset
     );
 
-    // ── Videos — channel filter ───────────────────────────────────────────────
-    // Supabase translates ?channel=eq.ChannelName → WHERE channel = 'ChannelName'
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  SEARCH BY ARTIST (for related songs)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @Headers("Prefer: count=exact")
+    @GET("rest/v1/youtube_videos")
+    Call<List<VideoModel>> getVideosByArtist(
+            @Header("apikey") String apiKey,
+            @Header("Authorization") String auth,
+            @Query("select") String select,
+            @Query("artist") String artistFilter,
+            @Query("order") String order,
+            @Query("limit") int limit,
+            @Query("offset") int offset
+    );
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  SEARCH BY VIDEO ID (single video lookup)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @Headers("Prefer: count=exact")
+    @GET("rest/v1/youtube_videos")
+    Call<List<VideoModel>> getVideosByVideoId(
+            @Header("apikey") String apiKey,
+            @Header("Authorization") String auth,
+            @Query("select") String select,
+            @Query("video_id") String videoIdFilter,
+            @Query("limit") int limit,
+            @Query("offset") int offset
+    );
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  FILTER BY CHANNEL
+    // ═══════════════════════════════════════════════════════════════════════════
 
     @Headers("Prefer: count=exact")
     @GET("rest/v1/youtube_videos")
@@ -51,12 +86,30 @@ public interface ApiService {
             @Header("Authorization") String auth,
             @Query("select") String select,
             @Query("order") String order,
-            @Query("channel") String channel,       // "eq.ChannelName"
+            @Query("channel") String channel,
             @Query("limit") int limit,
             @Query("offset") int offset
     );
 
-    // ── App update check ──────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  SEARCH BY TITLE OR ARTIST (combined)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @Headers("Prefer: count=exact")
+    @GET("rest/v1/youtube_videos")
+    Call<List<VideoModel>> searchVideosByTitleOrArtist(
+            @Header("apikey") String apiKey,
+            @Header("Authorization") String auth,
+            @Query("select") String select,
+            @Query("or") String orFilter,
+            @Query("order") String order,
+            @Query("limit") int limit,
+            @Query("offset") int offset
+    );
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  APP UPDATES
+    // ═══════════════════════════════════════════════════════════════════════════
 
     @GET("rest/v1/karaoke_apk_update")
     Call<List<UpdateModel>> getLatestVersion(

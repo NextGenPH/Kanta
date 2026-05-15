@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.Kanta" parent="Theme.Material3.DayNight.NoActionBar">
 
@@ -7,8 +7,8 @@
         <item name="android:windowBackground">@color/bg_primary</item>
         <item name="android:statusBarColor">@color/bg_surface</item>
         <item name="android:navigationBarColor">@color/bg_surface</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
 
         <!-- ── Brand colors ─────────────────────────────────────────────── -->
         <item name="colorPrimary">@color/accent_green</item>
@@ -40,7 +40,7 @@
         <item name="alertDialogTheme">@style/KantaAlertDialog</item>
         <item name="materialAlertDialogTheme">@style/KantaAlertDialog</item>
         <item name="materialButtonStyle">@style/KantaButton</item>
-        <item name="bottomSheetDialogTheme">@style/KantaBottomSheet</item>
+        <item name="bottomSheetDialogTheme">@style/KantaBottomSheetDialog</item>
 
         <!-- ── Ripple ────────────────────────────────────────────────────── -->
         <item name="colorControlHighlight">#1A3ECF8E</item>
@@ -67,7 +67,7 @@
 
     <!-- ── Alert Dialog ───────────────────────────────────────────────────── -->
 
-    <style name="KantaAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+    <style name="KantaAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="android:background">@color/bg_surface2</item>
         <item name="android:windowBackground">@color/bg_surface2</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
@@ -76,9 +76,14 @@
         <item name="colorAccent">@color/accent_green</item>
         <item name="colorSurface">@color/bg_surface2</item>
         <item name="colorOnSurface">@color/text_primary</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Kanta.MediumComponent</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
         <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
+    </style>
+
+    <style name="ShapeAppearance.Kanta.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerSize">28dp</item>
     </style>
 
     <style name="PositiveButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
@@ -113,13 +118,22 @@
 
     <!-- ── Bottom Sheet ───────────────────────────────────────────────────── -->
 
-    <style name="KantaBottomSheet" parent="ThemeOverlay.Material3.BottomSheetDialog">
+    <style name="KantaBottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/KantaBottomSheetModal</item>
     </style>
 
     <style name="KantaBottomSheetModal" parent="Widget.Material3.BottomSheet.Modal">
-        <item name="backgroundTint">@color/bg_surface</item>
+        <item name="backgroundTint">@color/bg_surface2</item>
         <item name="android:elevation">16dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Kanta.BottomSheet</item>
+    </style>
+
+    <style name="ShapeAppearance.Kanta.BottomSheet" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">24dp</item>
+        <item name="cornerSizeTopRight">24dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
     </style>
 
     <!-- ── SearchView ─────────────────────────────────────────────────────── -->

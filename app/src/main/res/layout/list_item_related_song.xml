@@ -3,35 +3,41 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    app:cardBackgroundColor="@color/bg_surface"
-    app:cardCornerRadius="10dp"
-    app:cardElevation="2dp"
-    app:strokeColor="#2e3850"
-    app:strokeWidth="1dp">
+    android:layout_marginBottom="@dimen/list_item_padding_large"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="8dp">
+        android:orientation="horizontal">
 
         <!-- Thumbnail -->
-        <ImageView
-            android:id="@+id/thumbnail"
-            android:layout_width="60dp"
-            android:layout_height="45dp"
-            android:background="#262d3d"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_thumbnail_placeholder" />
+        <androidx.cardview.widget.CardView
+            android:layout_width="@dimen/thumbnail_width"
+            android:layout_height="@dimen/thumbnail_height"
+            app:cardBackgroundColor="@color/bg_surface2"
+            app:cardCornerRadius="@dimen/thumbnail_corner_radius"
+            app:cardElevation="0dp">
+
+            <ImageView
+                android:id="@+id/thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/cd_video_thumbnail"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_thumbnail_placeholder" />
+
+        </androidx.cardview.widget.CardView>
 
         <!-- Song info -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/list_item_padding_large"
             android:layout_weight="1"
+            android:gravity="center_vertical"
             android:orientation="vertical">
 
             <TextView
@@ -40,33 +46,21 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:textColor="#e2e8f0"
-                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_normal"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/artist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="@dimen/spacing_tiny"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="#3ecf8e"
-                android:textSize="11sp" />
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_small" />
 
         </LinearLayout>
-
-        <!-- Add button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAddToQueue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#3ecf8e"
-            android:padding="8dp"
-            android:text="add"
-            android:textColor="#0a1a10"
-            android:textSize="12sp"
-            app:cornerRadius="16dp" />
 
     </LinearLayout>
 

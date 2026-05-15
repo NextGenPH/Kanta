@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- ── Onboarding ────────────────────────────────────────────────────── -->
+    <string name="onboarding_title_1">Welcome to Kanta</string>
+    <string name="onboarding_desc_1">Sing your heart out with thousands of karaoke songs from YouTube.</string>
+    <string name="onboarding_title_2">Search and Play</string>
+    <string name="onboarding_desc_2">Find your favorite songs by title or artist and start singing instantly.</string>
+    <string name="onboarding_title_3">Endless Karaoke</string>
+    <string name="onboarding_desc_3">Kanta automatically plays related songs so the music never stops.</string>
+    <string name="btn_skip">Skip</string>
+    <string name="btn_get_started">Get Started</string>
+
+    <!-- ── Updates ────────────────────────────────────────────────────────── -->
+    <string name="update_available">Update Available</string>
+    <string name="update_required">Update Required</string>
+    <string name="update_whats_new">What\'s New:</string>
+    <string name="update_force_hint">This update is required to continue using the app.</string>
+    <string name="update_downloading">Downloading…</string>
+    <string name="update_download_started">Download started…</string>
+    <string name="update_notification_title">Downloading Kanta Update</string>
+    <string name="update_notification_desc">Version %1$s</string>
+    <string name="update_version_label">Version %1$s</string>
+    <string name="btn_update_now">Update Now</string>
+    <string name="btn_later">Later</string>
+
     <!-- ── App ───────────────────────────────────────────────────────────── -->
     <string name="app_name">Kanta</string>
 
@@ -9,28 +32,49 @@
     <string name="cd_stop">Stop playback</string>
     <string name="cd_next">Next song</string>
     <string name="cd_video_thumbnail">Video thumbnail</string>
+    <string name="cd_play_pause">Play or Pause</string>
+    <string name="cd_rewind">Rewind 10 seconds</string>
 
     <!-- ── Player screen ──────────────────────────────────────────────────── -->
-    <string name="title_player">Karaoke Player</string>
     <string name="label_now_playing">NOW PLAYING :</string>
     <string name="no_song_playing">No song playing</string>
     <string name="fallback_title">Waiting for next song…</string>
     <string name="next_song_playing">Now playing: %1$s</string>
+    <string name="help_title">Quick Guide</string>
+    <string name="help_message">• Player: Tap the video to show playback controls and voice search.
+• Search: Find songs by title/artist or use the mic icon for voice search.
+• Direct Play: Simply tap any song to start singing immediately.
+• Autoplay: When a song ends, Kanta automatically plays a related song.
+• Favorites: Tap \"Favorites\" or swipe from the right edge to access saved songs.
+• Fullscreen: Rotate your phone or tap the expand icon to fill the screen.</string>
+    <string name="btn_got_it">Got it</string>
+    <!-- Resume Banner -->
+    <string name="resume_label">Previous Session</string>
+    <string name="btn_resume">Resume</string>
+    <string name="btn_dismiss">Dismiss</string>
 
     <!-- ── Queue ──────────────────────────────────────────────────────────── -->
     <string name="queue_info_title">Queue Information</string>
-    <string name="queue_empty_message">Queue is empty.\n\nTap Reserve from the main screen to add songs.</string>
+    <string name="queue_empty_message">Queue is empty.
+
+Tap Reserve from the main screen to add songs.</string>
     <string name="queue_total">Total songs in queue: %1$d</string>
     <string name="clear_queue_title">Clear Queue</string>
-    <string name="clear_queue_message">Remove all songs from the queue?\n\nThe current song will continue playing.</string>
-    <string name="label_queued">In Queue</string>
+    <string name="clear_queue_message">Remove all songs from the queue?
+
+The current song will continue playing.</string>
+    <string name="btn_queued">Played</string>
 
     <!-- ── Search dialog ──────────────────────────────────────────────────── -->
     <string name="search_title">Search Songs</string>
+    <string name="search_hint">Search song title…</string>
     <string name="search_prompt">Type or speak to search for songs…</string>
+    <string name="recent_searches">Recent Searches</string>
+    <string name="btn_clear_history">Clear History</string>
     <string name="search_found_zero">Found 0 songs</string>
     <string name="search_found_count">Found %1$d songs</string>
-    <string name="search_no_results">No songs found.\nTry a different keyword.</string>
+    <string name="search_no_results">No songs found.
+Try a different keyword.</string>
     <string name="search_error">Error: %1$s</string>
     <string name="searching">Searching…</string>
     <string name="voice_search_prompt">Search for a song…</string>
@@ -38,11 +82,35 @@
     <!-- ── Buttons ────────────────────────────────────────────────────────── -->
     <string name="btn_stop">Stop</string>
     <string name="btn_next">Next</string>
+    <string name="btn_previous">Previous</string>
     <string name="btn_close">Close</string>
     <string name="btn_clear">Clear</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_ok">OK</string>
-    <string name="btn_reserve">Reserve</string>
+    <string name="btn_reserve">Play</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="favorites_title">Favorite Songs</string>
+    <string name="favorites_empty">You haven\'t added any favorites yet.\n\nLong-press a song to add it to favorites.</string>
+    <string name="toast_added_favorite">Added to favorites</string>
+    <string name="toast_removed_favorite">Removed from favorites</string>
+    <string name="nav_settings">Help</string>
+    <string name="exit_title">Exit Karaoke?</string>
+    <string name="exit_message">You have %1$d song(s) in your queue.
+
+Exiting will remove all reserved songs.</string>
+    <string name="btn_stay">Stay</string>
+    <string name="btn_save_exit">Save and Exit</string>
+    <string name="btn_exit">Exit</string>
+    <string name="toast_queue_saved">Queue saved for next session</string>
+    <string name="snack_song_removed">Song removed from queue</string>
+    <string name="btn_undo">Undo</string>
+
+    <!-- ── Splash screen ─────────────────────────────────────────────────── -->
+    <string name="splash_tagline">Sing Your Heart Out</string>
+    <string name="error_no_internet">No Internet Connection</string>
+    <string name="error_check_connection">Please check your connection</string>
+    <string name="btn_retry">Retry</string>
 
     <!-- ── Toast messages ─────────────────────────────────────────────────── -->
     <string name="toast_stopped">Stopped</string>
@@ -51,15 +119,20 @@
     <string name="toast_speech_unsupported">Speech recognition is not supported on this device</string>
     <string name="toast_mic_denied">Microphone permission is needed for voice search</string>
 
+    <string name="welcome_hint">Welcome! Search and reserve songs to start the party.</string>
+    <string name="queue_one_more">and 1 more song</string>
+    <string name="queue_more">and %1$d more songs</string>
+
     <!-- Related songs -->
     <string name="related_title">Related Songs</string>
     <string name="related_searching">Searching for %1$s…</string>
     <string name="related_more_from">More from %1$s</string>
     <string name="related_none_found">No other songs found for %1$s</string>
+    <string name="related_songs_error">Error loading related songs: %1$s</string>
 
     <!-- Toast with title -->
     <string name="toast_added_title">Added: %1$s</string>
     <string name="label_next_up">NEXT UP</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="search_error_toast">Search error: %1$s</string>
+    <string name="search_failed">Search failed. Please try again.</string>
 </resources>

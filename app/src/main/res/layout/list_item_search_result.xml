@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    app:cardBackgroundColor="#1c2333"
-    app:cardCornerRadius="8dp"
+    android:layout_marginBottom="@dimen/spacing_small"
+    app:cardBackgroundColor="@color/bg_surface"
+    app:cardCornerRadius="@dimen/spacing_small"
     app:cardElevation="0dp"
-    app:strokeColor="#2e3850"
+    app:strokeColor="@color/divider"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -15,15 +15,16 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="@dimen/list_item_padding_large">
 
         <!-- Thumbnail Image -->
         <ImageView
             android:id="@+id/thumbnail"
-            android:layout_width="60dp"
-            android:layout_height="45dp"
-            android:layout_marginEnd="12dp"
-            android:background="#262d3d"
+            android:layout_width="@dimen/thumbnail_width_small"
+            android:layout_height="@dimen/thumbnail_height_small"
+            android:layout_marginEnd="@dimen/spacing_medium"
+            android:background="@color/bg_surface2"
+            android:contentDescription="@string/cd_video_thumbnail"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_thumbnail_placeholder" />
 
@@ -40,31 +41,19 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:textColor="#e2e8f0"
-                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_normal"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/channel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="#3ecf8e"
+                android:layout_marginTop="@dimen/spacing_tiny"
+                android:textColor="@color/accent_green"
                 android:textSize="11sp" />
 
         </LinearLayout>
-
-        <!-- Reserve button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnReserve"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#3ecf8e"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:text="Reserve"
-            android:textColor="#0a1a10"
-            android:textSize="12sp" />
 
     </LinearLayout>
 

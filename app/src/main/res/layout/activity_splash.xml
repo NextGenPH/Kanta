@@ -1,94 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0e1117"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:background="@color/bg_primary">
 
-    <!-- Logo/Icon -->
+    <!-- Centered Logo (YouTube Style) -->
     <ImageView
         android:id="@+id/ivLogo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="@dimen/logo_size"
+        android:layout_height="@dimen/logo_size"
+        android:layout_centerInParent="true"
+        android:contentDescription="@string/app_name"
         android:src="@drawable/app_ic" />
 
-    <!-- App Name -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Kanta"
-        android:textColor="#3ecf8e"
-        android:textSize="32sp"
-        android:textStyle="bold" />
-
-    <!-- Tagline -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Sing Your Heart Out"
-        android:textColor="#94a3b8"
-        android:textSize="14sp" />
-
-    <!-- Loading indicator -->
+    <!-- Progress Bar at bottom to indicate loading -->
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginTop="48dp"
-        android:indeterminateTint="#3ecf8e"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="@dimen/spacing_huge"
+        android:layout_marginEnd="@dimen/spacing_huge"
+        android:layout_marginBottom="@dimen/spacing_extra_large"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/accent_green"
         android:visibility="visible" />
 
-    <!-- Error/Retry layout (initially hidden) -->
+    <!-- Error Overlay (Hidden by default) -->
     <LinearLayout
         android:id="@+id/errorLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg_primary"
         android:gravity="center"
         android:orientation="vertical"
+        android:padding="@dimen/spacing_large"
         android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="⚠️"
-            android:textColor="#ef4444"
-            android:textSize="32sp" />
+            android:textSize="@dimen/text_header" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="No Internet Connection"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:text="@string/error_no_internet"
             android:textColor="#ef4444"
-            android:textSize="14sp"
+            android:textSize="@dimen/text_normal"
             android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Please check your connection"
-            android:textColor="#94a3b8"
-            android:textSize="12sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRetry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:backgroundTint="#3ecf8e"
-            android:paddingStart="32dp"
-            android:paddingEnd="32dp"
-            android:text="Retry"
-            android:textColor="#0a1a10"
-            android:textSize="14sp"
-            app:cornerRadius="24dp" />
-
+            android:layout_marginTop="@dimen/spacing_large"
+            android:text="@string/btn_retry"
+            app:cornerRadius="@dimen/card_corner_radius" />
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

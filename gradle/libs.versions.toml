@@ -1,18 +1,21 @@
 [versions]
-agp = "9.2.0"
+agp = "9.2.1"
 core = "13.0.0"
 glide = "5.0.7"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-appcompat = "1.6.1"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
+appcompat = "1.7.1"
 loggingInterceptor = "5.3.2"
-material = "1.10.0"
-activityKtx = "1.8.0"
-constraintlayout = "2.1.4"
-navigationUi = "2.9.8"
+material = "1.14.0"
+activityKtx = "1.13.0"
+constraintlayout = "2.2.1"
 retrofit = "3.0.0"
 swiperefreshlayout = "1.2.0"
+lifecycle = "2.10.0"
+mediarouter = "1.8.1"
+playServicesCast = "22.3.1"
+chromecastSender = "0.32"
 
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
@@ -27,9 +30,13 @@ logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", ver
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "navigationUi" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
+lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
+mediarouter = { group = "androidx.mediarouter", name = "mediarouter", version.ref = "mediarouter" }
+play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "playServicesCast" }
+chromecast-sender = { group = "com.pierfrancescosoffritti.androidyoutubeplayer", name = "chromecast-sender", version.ref = "chromecastSender" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

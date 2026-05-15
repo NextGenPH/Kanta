@@ -19,13 +19,13 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-# Keep our main classes but obfuscate everything else
-# Keep our main classes but obfuscate everything else
--keep class com.sns.kanta.Mainactivity { *; }
+# Keep our main classes and models for GSON/Serialization
+-keep class com.sns.kanta.MainActivity { *; }
+-keep class com.sns.kanta.SplashActivity { *; }
+-keep class com.sns.kanta.OnboardingActivity { *; }
+-keep class com.sns.kanta.model.** { *; }
 -keep class com.sns.kanta.queueing.QueueManager { *; }
--keep class com.sns.kanta.queueing.ReservationModel { *; }
--keep class com.sns.kanta.adapter.UpdateManager { *; }
--keep class com.sns.kanta.server.ApiService { *; }
+-keep class com.sns.kanta.server.** { *; }
 
 # Keep YouTube Player classes
 -keep class com.pierfrancescosoffritti.** { *; }

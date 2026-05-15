@@ -2,26 +2,24 @@
 <resources>
 
     <!-- ── App backgrounds ───────────────────────────────────────────────── -->
-    <color name="bg_primary">#0E1117</color>
-    <color name="bg_surface">#161B25</color>
-    <color name="bg_surface2">#1C2333</color>
+    <color name="bg_primary">#F8FAFC</color>
+    <color name="bg_surface">#FFFFFF</color>
+    <color name="bg_surface2">#F1F5F9</color>
 
     <!-- ── Borders / dividers ────────────────────────────────────────────── -->
-    <color name="divider">#262D3D</color>
+    <color name="divider">#E2E8F0</color>
 
     <!-- ── Text ──────────────────────────────────────────────────────────── -->
-    <color name="text_primary">#E2E8F0</color>
-    <color name="text_secondary">#94A3B8</color>
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#64748B</color>
 
     <!-- ── Accent ────────────────────────────────────────────────────────── -->
-    <color name="accent_green">#3ECF8E</color>
-    <color name="accent_green_dark">#2EAF7A</color>
-    <!-- 10% opacity -->
-    <!-- 20% opacity -->
+    <color name="accent_green">#27AE60</color>
+    <color name="accent_green_dark">#219150</color>
 
     <!-- ── Semantic ──────────────────────────────────────────────────────── -->
 
     <!-- ── Ripple ────────────────────────────────────────────────────────── -->
-    <color name="ripple_green">#1A3ECF8E</color>
+    <color name="ripple_green">#1A2ECC71</color>
 
 </resources>

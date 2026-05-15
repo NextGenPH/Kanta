@@ -5,36 +5,15 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Mainactivity">
+    android:background="@color/bg_primary"
+    tools:context=".MainActivity">
 
-    <!-- Main Content (Your existing layout wrapped in a LinearLayout) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Your existing appbar -->
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/bg_surface"
-            app:elevation="0dp">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:gravity="center_vertical"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                app:navigationIcon="@drawable/ic_menu"
-                app:navigationIconTint="@color/text_primary"
-                app:title="@string/title_player"
-                app:titleMarginStart="8dp"
-                app:titleTextAppearance="@style/ToolbarTitleBold" />
-
-        </com.google.android.material.appbar.AppBarLayout><!-- The rest of your existing content -->
+        <!-- Player wrapper (Fixed at Top) -->
         <FrameLayout
             android:id="@+id/playerWrapper"
             android:layout_width="match_parent"
@@ -51,13 +30,14 @@
                     android:id="@+id/youtubePlayerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center" />
+                    android:layout_gravity="center"
+                    app:enableAutomaticInitialization="false" />
 
                 <ProgressBar
                     android:id="@+id/loadingIndicator"
                     style="?android:attr/progressBarStyleLarge"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="@dimen/spacing_huge"
+                    android:layout_height="@dimen/spacing_huge"
                     android:layout_gravity="center"
                     android:indeterminateTint="@color/accent_green"
                     android:visibility="gone" />
@@ -68,290 +48,450 @@
                 android:id="@+id/controlsOverlay"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/transparent"
+                android:background="#66000000"
                 android:clickable="true"
                 android:focusable="true">
+
+                <!-- Double Tap Visual Feedback -->
+                <LinearLayout
+                    android:id="@+id/layoutRewindFeedback"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|start"
+                    android:layout_marginStart="48dp"
+                    android:alpha="0"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/cd_play_pause"
+                        android:src="@drawable/ic_rewind_10"
+                        app:tint="@android:color/white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-10s"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layoutForwardFeedback"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="48dp"
+                    android:alpha="0"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/cd_play_pause"
+                        android:src="@drawable/ic_forward_10"
+                        app:tint="@android:color/white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+10s"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Top Info Bar -->
+                <LinearLayout
+                    android:id="@+id/topInfoBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_top_gradient"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/spacing_normal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvOverlayTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/text_medium"
+                            android:textStyle="bold"
+                            tools:text="Bohemian Rhapsody" />
+
+                        <TextView
+                            android:id="@+id/tvOverlayArtist"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/accent_green"
+                            android:textSize="@dimen/text_small"
+                            tools:text="Queen" />
+                    </LinearLayout>
+
+                    <androidx.mediarouter.app.MediaRouteButton
+                        android:id="@+id/mediaRouteButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:mediaRouteButtonTint="@android:color/white" />
+
+                </LinearLayout>
+
+                <!-- Center Controls -->
+                <LinearLayout
+                    android:id="@+id/centerControls"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btnOverlayPrevious"
+                        android:layout_width="@dimen/overlay_control_size_normal"
+                        android:layout_height="@dimen/overlay_control_size_normal"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/btn_previous"
+                        android:padding="@dimen/overlay_icon_padding"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_skip_previous"
+                        app:tint="@android:color/white" />
+
+                    <ImageButton
+                        android:id="@+id/btnOverlayPlayPause"
+                        android:layout_width="@dimen/overlay_control_size_large"
+                        android:layout_height="@dimen/overlay_control_size_large"
+                        android:layout_marginHorizontal="@dimen/spacing_normal"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_play_pause"
+                        android:padding="@dimen/overlay_icon_padding"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_play"
+                        app:tint="@android:color/white" />
+
+                    <ImageButton
+                        android:id="@+id/btnOverlayNext"
+                        android:layout_width="@dimen/overlay_control_size_normal"
+                        android:layout_height="@dimen/overlay_control_size_normal"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_next"
+                        android:padding="@dimen/overlay_icon_padding"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_skip_next"
+                        app:tint="@android:color/white" />
+
+                </LinearLayout>
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/btnFullscreen"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top|end"
-                    android:layout_margin="8dp"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="@dimen/spacing_normal"
                     android:contentDescription="@string/cd_fullscreen"
                     app:backgroundTint="#CC000000"
                     app:borderWidth="0dp"
-                    app:elevation="12dp"
+                    app:elevation="0dp"
                     app:fabSize="mini"
                     app:srcCompat="@drawable/ic_fullscreen"
                     app:tint="@android:color/white" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/btnVoiceSearchOverlay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|start"
+                    android:layout_margin="@dimen/spacing_normal"
+                    android:contentDescription="@string/nav_search"
+                    app:backgroundTint="#CC000000"
+                    app:borderWidth="0dp"
+                    app:elevation="0dp"
+                    app:fabSize="mini"
+                    app:srcCompat="@drawable/ic_mic"
+                    app:tint="@android:color/white" />
+
+                <LinearLayout
+                    android:id="@+id/resumeBanner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:background="#E6000000"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="14dp"
+                    android:paddingTop="@dimen/spacing_small"
+                    android:paddingEnd="@dimen/spacing_small"
+                    android:paddingBottom="@dimen/spacing_small"
+                    android:translationY="80dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.08"
+                            android:text="@string/resume_label"
+                            android:textColor="@color/accent_green"
+                            android:textSize="@dimen/text_tiny"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtResumeTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/text_small"
+                            android:textStyle="bold"
+                            tools:text="Bohemian Rhapsody" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnResume"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/button_height_small"
+                        android:layout_marginStart="@dimen/spacing_small"
+                        android:minWidth="0dp"
+                        android:paddingStart="@dimen/spacing_medium"
+                        android:paddingEnd="@dimen/spacing_medium"
+                        android:text="@string/btn_resume"
+                        android:textColor="@color/accent_green"
+                        android:textSize="@dimen/text_small"
+                        app:backgroundTint="@color/accent_green"
+                        app:cornerRadius="@dimen/spacing_small"
+                        app:strokeColor="@color/accent_green"
+                        app:strokeWidth="1dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDismissResume"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/button_height_small"
+                        android:layout_marginStart="@dimen/spacing_tiny"
+                        android:minWidth="0dp"
+                        android:paddingStart="@dimen/spacing_small"
+                        android:paddingEnd="@dimen/spacing_small"
+                        android:text="@string/btn_dismiss"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_small" />
+
+                </LinearLayout>
 
             </FrameLayout>
 
         </FrameLayout>
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/contentScrollView"
+        <!-- Main Content + Bottom Sheet Area -->
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:fillViewport="false">
+            android:layout_weight="1">
 
-            <LinearLayout
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/nestedScrollView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="24dp">
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:fillViewport="true"
+                android:paddingBottom="@dimen/bottom_nav_padding">
 
-                <com.google.android.material.card.MaterialCardView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="12dp"
-                    app:cardBackgroundColor="@color/bg_surface"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/divider"
-                    app:strokeWidth="0dp">
+                    android:orientation="vertical">
 
-                    <LinearLayout
+                    <!-- Now Playing card -->
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                        android:layout_margin="@dimen/main_padding"
+                        app:cardBackgroundColor="@color/bg_surface"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/divider"
+                        app:strokeWidth="0dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="vertical"
+                            android:padding="@dimen/spacing_normal">
 
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
-                                android:letterSpacing="0.1"
-                                android:text="@string/label_now_playing"
-                                android:textColor="@color/accent_green"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
+                                android:layout_marginBottom="6dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:letterSpacing="0.1"
+                                    android:text="@string/label_now_playing"
+                                    android:textColor="@color/accent_green"
+                                    android:textSize="@dimen/text_tiny"
+                                    android:textStyle="bold" />
+
+                                <include
+                                    android:id="@+id/visualizer"
+                                    layout="@layout/layout_visualizer"
+                                    android:visibility="gone" />
+
+                            </LinearLayout>
 
                             <TextView
                                 android:id="@+id/txtSongTitle"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
                                 android:lineSpacingMultiplier="1.2"
                                 android:textColor="@color/text_primary"
-                                android:textSize="16sp"
+                                android:textSize="@dimen/text_medium"
                                 android:textStyle="bold"
                                 tools:text="Bohemian Rhapsody" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/txtSongChannel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:background="@drawable/bg_channel_badge"
-                            android:paddingTop="2dp"
-                            android:paddingEnd="8dp"
-                            android:paddingBottom="2dp"
-                            android:textColor="@color/accent_green"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            tools:text="Queen Karaoke" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:gravity="center"
-                            android:orientation="horizontal">
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnStop"
-                                style="@style/Widget.Material3.Button.TonalButton"
-                                android:layout_width="0dp"
-                                android:layout_height="48dp"
-                                android:layout_marginEnd="8dp"
-                                android:layout_weight="1"
-                                android:contentDescription="@string/cd_stop"
-                                android:text="@string/btn_stop"
-                                android:textColor="#FFFFFF"
-                                android:textSize="13sp"
-                                app:backgroundTint="#EF4444"
-                                app:cornerRadius="10dp"
-                                app:icon="@drawable/ic_stop"
-                                app:iconGravity="textStart"
-                                app:iconSize="16dp"
-                                app:iconTint="#FFFFFF" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnNextSong"
-                                style="@style/Widget.Material3.Button.TonalButton"
-                                android:layout_width="0dp"
-                                android:layout_height="48dp"
-                                android:layout_weight="1"
-                                android:contentDescription="@string/cd_next"
-                                android:text="@string/btn_next"
-                                android:textColor="#FFFFFF"
-                                android:textSize="13sp"
-                                app:backgroundTint="#3ECF8E"
-                                app:cornerRadius="10dp"
-                                app:icon="@drawable/ic_skip_next"
-                                app:iconGravity="textStart"
-                                app:iconSize="16dp"
-                                app:iconTint="#FFFFFF" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/nextSongCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginBottom="12dp"
-                    android:visibility="gone"
-                    app:cardBackgroundColor="@color/bg_surface"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/divider"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="12dp">
-
-                        <ImageView
-                            android:id="@+id/imgNextThumb"
-                            android:layout_width="50dp"
-                            android:layout_height="38dp"
-                            android:background="@color/divider"
-                            android:contentDescription="@string/cd_video_thumbnail"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/ic_thumbnail_placeholder" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/txtSongChannel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/label_next_up"
+                                android:layout_marginTop="@dimen/spacing_small"
+                                android:background="@drawable/bg_channel_badge"
+                                android:paddingStart="@dimen/spacing_small"
+                                android:paddingTop="2dp"
+                                android:paddingEnd="@dimen/spacing_small"
+                                android:paddingBottom="2dp"
                                 android:textColor="@color/accent_green"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
+                                android:textSize="@dimen/text_small"
+                                android:textStyle="bold"
+                                tools:text="Queen" />
 
                             <TextView
-                                android:id="@+id/txtNextTitle"
-                                android:layout_width="match_parent"
+                                android:id="@+id/txtSongSource"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:textColor="@color/text_primary"
-                                android:textSize="13sp"
-                                android:textStyle="bold"
-                                tools:text="Next Song Title" />
+                                android:layout_marginTop="4dp"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="@dimen/text_tiny"
+                                tools:text="Source: Queen Karaoke" />
 
                         </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/txtQueueCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_queue_count"
-                            android:paddingStart="12dp"
-                            android:paddingTop="6dp"
-                            android:paddingEnd="12dp"
-                            android:paddingBottom="6dp"
-                            android:textColor="@color/accent_green"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            tools:text="3 more" />
+                    </com.google.android.material.card.MaterialCardView>
 
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardRelatedSongs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginBottom="24dp"
-                    android:visibility="gone"
-                    app:cardBackgroundColor="@color/bg_surface"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/divider"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
+                    <!-- Related songs card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardRelatedSongs"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="12dp">
+                        android:layout_marginStart="@dimen/main_padding"
+                        android:layout_marginEnd="@dimen/main_padding"
+                        android:layout_marginBottom="24dp"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="@color/bg_surface"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/divider"
+                        app:strokeWidth="0dp">
 
-                        <TextView
-                            android:id="@+id/txtRelatedSectionTitle"
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="12dp"
-                            android:letterSpacing="0.1"
-                            android:textColor="@color/text_primary"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            tools:text="Related Songs" />
+                            android:orientation="vertical"
+                            android:padding="@dimen/spacing_normal">
 
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/rvRelatedSongs"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:nestedScrollingEnabled="true"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                            <TextView
+                                android:id="@+id/txtRelatedSectionTitle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/spacing_medium"
+                                android:letterSpacing="0.1"
+                                android:textColor="@color/text_primary"
+                                android:textSize="@dimen/text_small"
+                                android:textStyle="bold"
+                                tools:text="Related Songs" />
 
-                        <TextView
-                            android:id="@+id/txtNoRelated"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:padding="16dp"
-                            android:text="@string/related_none_found"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp"
-                            android:visibility="gone" />
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rvRelatedSongs"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:nestedScrollingEnabled="true"
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-                    </LinearLayout>
+                            <TextView
+                                android:id="@+id/txtNoRelated"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:padding="@dimen/spacing_normal"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp"
+                                android:visibility="gone"
+                                tools:text="No related songs found" />
 
-                </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
 
-            </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
-        </androidx.core.widget.NestedScrollView>
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+            <!-- Search Bottom Sheet (Persistent) -->
+            <FrameLayout
+                android:id="@+id/searchBottomSheet"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/bg_surface2"
+                app:behavior_hideable="true"
+                app:behavior_peekHeight="0dp"
+                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+                <include
+                    android:id="@+id/searchContent"
+                    layout="@layout/dialog_search_song" />
+
+            </FrameLayout>
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottomNavigationView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="@color/bg_surface"
+                app:elevation="8dp"
+                app:itemIconTint="@color/bottom_nav_item_color"
+                app:itemTextColor="@color/bottom_nav_item_color"
+                app:labelVisibilityMode="labeled"
+                app:menu="@menu/bottom_nav_menu" />
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     </LinearLayout>
 
-    <!-- Navigation Drawer -->
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navigationView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@color/bg_surface"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/drawer_header"
-        app:menu="@menu/drawer_menu" />
+    <!-- Favorites Drawer -->
+    <include
+        android:id="@+id/favoritesDrawer"
+        layout="@layout/layout_favorites_drawer" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
