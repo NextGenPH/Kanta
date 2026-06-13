@@ -1,0 +1,52 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+
+    <!-- Outer Circle / Background -->
+    <path android:pathData="M256,512C397.385,512 512,397.385 512,256C512,114.615 397.385,0 256,0C114.615,0 0,114.615 0,256C0,397.385 114.615,512 256,512Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="420"
+                android:endY="420"
+                android:startX="92"
+                android:startY="92"
+                android:type="linear">
+                <item
+                    android:color="#3ECF8E"
+                    android:offset="0" />
+                <item
+                    android:color="#2EAD72"
+                    android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Subtle Inner Shadow/Gradient for depth -->
+    <path
+        android:fillColor="#10000000"
+        android:pathData="M256,480C379.706,480 480,379.706 480,256C480,132.294 379.706,32 256,32C132.294,32 32,132.294 32,256C32,379.706 132.294,480 256,480Z" />
+
+    <!-- Microphone Body -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M256,120c-33.1,0 -60,26.9 -60,60v100c0,33.1 26.9,60 60,60s60,-26.9 60,-60V180c0,-33.1 -26.9,-60 -60,-60z" />
+
+    <!-- Microphone Stand / Holder -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M376,240h-20c0,53 -43,96 -96,96s-96,-43 -96,-96h-20c0,60.2 45.4,110.2 104,115.3V400h-40v20h104v-20h-40v-44.7c58.6,-5.1 104,-55.1 104,-115.3z" />
+
+    <!-- Music Note / Sound Wave Symbol -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M256,150h-2v60h2c16.6,0 30,13.4 30,30s-13.4,30 -30,30h-2v20h2c27.6,0 50,-22.4 50,-50S283.6,150 256,150z" />
+
+    <!-- Microphone Mesh Pattern (Visual dots) -->
+    <path
+        android:fillColor="#3ECF8E"
+        android:pathData="M241,180h5v5h-5zM253,180h5v5h-5zM265,180h5v5h-5zM241,200h5v5h-5zM253,200h5v5h-5zM265,200h5v5h-5zM241,220h5v5h-5zM253,220h5v5h-5zM265,220h5v5h-5z" />
+
+</vector>
