@@ -25,9 +25,9 @@
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp"
         app:tabMaxWidth="12dp"
-        app:tabPaddingEnd="4dp"
+        app:tabRippleColor="@null"
         app:tabPaddingStart="4dp"
-        app:tabRippleColor="@null" />
+        app:tabPaddingEnd="4dp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSkip"
