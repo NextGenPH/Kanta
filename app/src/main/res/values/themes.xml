@@ -136,15 +136,56 @@
         <item name="cornerSizeBottomRight">0dp</item>
     </style>
 
+    <style name="ShapeAppearance.Kanta.ThumbnailSmall" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/thumbnail_corner_radius</item>
+    </style>
+
+    <style name="ShapeAppearance.Kanta.Circular" parent="ShapeAppearance.Material3.Corner.Full">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
     <!-- ── SearchView ─────────────────────────────────────────────────────── -->
 
     <!-- ── MaterialCardView ──────────────────────────────────────────────── -->
+
+    <style name="BottomNavText.Active" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="BottomNavText.Inactive" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="Widget.Kanta.FilterChip" parent="Widget.Material3.Chip.Suggestion">
+        <item name="android:checkable">true</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="chipBackgroundColor">@color/bg_surface2</item>
+        <item name="chipStrokeWidth">0dp</item>
+    </style>
+
+    <style name="Theme.Kanta.Player" parent="Theme.Kanta">
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 
     <!-- Splash screen theme — windowBackground matches your dark bg -->
     <style name="Theme.Kanta.Splash" parent="Theme.Kanta">
         <item name="android:windowBackground">@drawable/splash_background</item>
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <!-- Theme overlay for BottomNav and NavigationRail to safely customize M3 active indicator colors -->
+    <style name="ThemeOverlay.Kanta.BottomNav" parent="">
+        <!-- active indicator pill background color (10% opacity primary accent green) -->
+        <item name="colorPrimaryContainer">#1A27AE60</item>
+        <!-- active icon / text color -->
+        <item name="colorOnPrimaryContainer">?attr/colorPrimary</item>
     </style>
 
 </resources>

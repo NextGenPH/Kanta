@@ -6,25 +6,36 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.AsyncListDiffer;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sns.kanta.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public final class SearchHistoryAdapter extends RecyclerView.Adapter<SearchHistoryAdapter.ViewHolder> {
 
     private final OnHistoryClickListener clickListener;
-    private List<String> historyItems = new ArrayList<>();
+
+    private final AsyncListDiffer<String> differ = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<String>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull String oldItem, @NonNull String newItem) {
+            return oldItem.equals(newItem);
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull String oldItem, @NonNull String newItem) {
+            return oldItem.equals(newItem);
+        }
+    });
 
     public SearchHistoryAdapter(OnHistoryClickListener clickListener) {
         this.clickListener = clickListener;
     }
 
     public void setHistoryItems(List<String> items) {
-        this.historyItems = items;
-        notifyDataSetChanged();
+        differ.submitList(items);
     }
 
     @NonNull
@@ -37,26 +48,31 @@ public final class SearchHistoryAdapter extends RecyclerView.Adapter<SearchHisto
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String query = historyItems.get(position);
+        String query = differ.getCurrentList().get(position);
         holder.txtQuery.setText(query);
         holder.itemView.setOnClickListener(v -> clickListener.onHistoryClick(query));
+        holder.btnRemove.setOnClickListener(v -> clickListener.onRemoveHistory(query));
     }
 
     @Override
     public int getItemCount() {
-        return historyItems.size();
+        return differ.getCurrentList().size();
     }
 
     public interface OnHistoryClickListener {
         void onHistoryClick(String query);
+
+        void onRemoveHistory(String query);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtQuery;
+        View btnRemove;
 
         ViewHolder(View itemView) {
             super(itemView);
             txtQuery = itemView.findViewById(R.id.txtHistoryQuery);
+            btnRemove = itemView.findViewById(R.id.btnRemoveHistory);
         }
     }
 }

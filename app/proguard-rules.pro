@@ -1,62 +1,79 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# ── GENERAL CONFIGURATION ───────────────────────────────────────────────────
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+-keepattributes Signature, InnerClasses, EnclosingMethod, *Annotation*, SourceFile, LineNumberTable
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Keep our main activities
+-keep class com.sns.kanta.** { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
-# Keep our main classes and models for GSON/Serialization
--keep class com.sns.kanta.MainActivity { *; }
--keep class com.sns.kanta.SplashActivity { *; }
--keep class com.sns.kanta.OnboardingActivity { *; }
+# ── DATA & MODELS (CRITICAL FOR GSON/ROOM) ──────────────────────────────────
+
+# Keep all models used for JSON serialization and their original names
 -keep class com.sns.kanta.model.** { *; }
--keep class com.sns.kanta.queueing.QueueManager { *; }
--keep class com.sns.kanta.server.** { *; }
+-keepclassmembers class com.sns.kanta.model.** { <fields>; }
+-keepnames class com.sns.kanta.model.** { *; }
 
-# Keep YouTube Player classes
+# Keep all Room entities, DAOs and Database
+-keep class com.sns.kanta.data.local.** { *; }
+-keepclassmembers class com.sns.kanta.data.local.** { *; }
+
+# ── LIBRARIES ───────────────────────────────────────────────────────────────
+
+# YouTube Player
 -keep class com.pierfrancescosoffritti.** { *; }
 
-# Keep Retrofit and GSON
--keepattributes Signature, InnerClasses, EnclosingMethod
--keepattributes *Annotation*
+# Retrofit 3 & OkHttp
+-keepattributes *Annotation*, Signature, InnerClasses, EnclosingMethod
 -keep class retrofit2.** { *; }
--keep class com.google.gson.** { *; }
--dontwarn okhttp3.**
 -dontwarn retrofit2.**
--dontwarn com.google.gson.**
+-keep class okhttp3.** { *; }
+-dontwarn okhttp3.**
 
-# Remove all logs in release (IMPORTANT!)
+# GSON
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.google.gson.** { *; }
+-dontwarn com.google.gson.**
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
+
+# Android Security Crypto (Tink)
+-keep class com.google.crypto.tink.** { *; }
+-dontwarn com.google.crypto.tink.**
+-keep class androidx.security.crypto.** { *; }
+-dontwarn androidx.security.crypto.**
+
+# Facebook Shimmer
+-keep class com.facebook.shimmer.** { *; }
+
+# Glide & Transformations
+-keep public class * extends com.bumptech.glide.module.AppGlideModule
+-keep public class * extends com.bumptech.glide.module.LibraryGlideModule
+-keep class jp.wasabeef.glide.transformations.** { *; }
+-dontwarn com.bumptech.glide.**
+
+# ── ROOM SPECIFIC ───────────────────────────────────────────────────────────
+
+-keep class * extends androidx.room.RoomDatabase
+-dontwarn androidx.room.paging.**
+
+# ── OPTIMIZATION & CLEANUP ──────────────────────────────────────────────────
+
+# Remove debug, verbose, and info logs in release to protect code and save size
+# We KEEP Log.e() and Log.w() for production troubleshooting
 -assumenosideeffects class android.util.Log {
     public static *** d(...);
     public static *** v(...);
     public static *** i(...);
-    public static *** w(...);
-    public static *** e(...);
 }
 
-# Obfuscate class names aggressively
--flattenpackagehierarchy
--allowaccessmodification
--repackageclasses ''
+# Standard R8/ProGuard safety
+-dontwarn android.support.**
+-dontwarn androidx.**
 
-# Remove debugging attributes
--dontoptimize
--dontpreverify
-
-# Enable optimization
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
--optimizationpasses 5
+# Relaxed obfuscation for higher stability in first release
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-verbose

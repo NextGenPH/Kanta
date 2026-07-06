@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 
 import com.sns.kanta.helper.SongParser;
 
+import java.util.Objects;
+
 /**
  * Immutable data carrier for one queued song.
  * <p>
@@ -19,9 +21,7 @@ public final class ReservationModel {
     private final String title;
     private final String channel;
     private final String thumbnail;
-    private final String reserverName;
     private final String artist;     // nullable — from DB artist column
-    private final long timestamp;
 
     // ── Gson no-arg ───────────────────────────────────────────────────────────
     @SuppressWarnings("unused")
@@ -30,18 +30,15 @@ public final class ReservationModel {
         this.title = "";
         this.channel = "";
         this.thumbnail = null;
-        this.reserverName = "";
         this.artist = null;
-        this.timestamp = 0L;
     }
 
     // ── Without thumbnail ─────────────────────────────────────────────────────
     public ReservationModel(
             @NonNull String videoId,
             @NonNull String title,
-            @NonNull String channel,
-            @NonNull String reserverName) {
-        this(videoId, title, channel, null, null, reserverName);
+            @NonNull String channel) {
+        this(videoId, title, channel, null, null);
     }
 
     // ── With thumbnail, no artist ─────────────────────────────────────────────
@@ -49,9 +46,8 @@ public final class ReservationModel {
             @NonNull String videoId,
             @NonNull String title,
             @NonNull String channel,
-            @Nullable String thumbnail,
-            @NonNull String reserverName) {
-        this(videoId, title, channel, thumbnail, null, reserverName);
+            @Nullable String thumbnail) {
+        this(videoId, title, channel, thumbnail, null);
     }
 
     // ── Full constructor ──────────────────────────────────────────────────────
@@ -60,32 +56,29 @@ public final class ReservationModel {
             @NonNull String title,
             @NonNull String channel,
             @Nullable String thumbnail,
-            @Nullable String artist,
-            @NonNull String reserverName) {
+            @Nullable String artist) {
         this.videoId = videoId;
         this.title = title;
         this.channel = channel;
         this.thumbnail = thumbnail;
         this.artist = artist;
-        this.reserverName = reserverName;
-        this.timestamp = System.currentTimeMillis();
     }
 
     // ── Getters ───────────────────────────────────────────────────────────────
 
     @NonNull
     public String getVideoId() {
-        return videoId != null ? videoId : "";
+        return Objects.requireNonNullElse(videoId, "");
     }
 
     @NonNull
     public String getTitle() {
-        return title != null ? title : "";
+        return Objects.requireNonNullElse(title, "");
     }
 
     @NonNull
     public String getChannel() {
-        return channel != null ? channel : "";
+        return Objects.requireNonNullElse(channel, "");
     }
 
     @Nullable
@@ -96,15 +89,6 @@ public final class ReservationModel {
     @Nullable
     public String getArtist() {
         return artist;
-    }
-
-    @NonNull
-    public String getReserverName() {
-        return reserverName != null ? reserverName : "";
-    }
-
-    public long getTimestamp() {
-        return timestamp;
     }
 
     /**
@@ -143,7 +127,6 @@ public final class ReservationModel {
     @Override
     public String toString() {
         return "ReservationModel{videoId='" + videoId
-                + "', artist='" + artist
-                + "', reserver='" + reserverName + "'}";
+                + "', artist='" + artist + "'}";
     }
 }

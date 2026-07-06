@@ -25,9 +25,9 @@
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp"
         app:tabMaxWidth="12dp"
-        app:tabRippleColor="@null"
+        app:tabPaddingEnd="4dp"
         app:tabPaddingStart="4dp"
-        app:tabPaddingEnd="4dp" />
+        app:tabRippleColor="@null" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSkip"
@@ -47,7 +47,7 @@
         android:layout_margin="@dimen/spacing_large"
         android:text="@string/btn_next"
         android:textColor="@color/bg_primary"
-        app:backgroundTint="@color/accent_green"
+        app:backgroundTint="?attr/colorPrimary"
         app:cornerRadius="@dimen/card_corner_radius"
         app:layout_constraintBottom_toBottomOf="parent" />
 

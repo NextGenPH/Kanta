@@ -13,26 +13,70 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
+import com.nextgen.updater.NextGenUpdater;
 import com.sns.kanta.databinding.ActivitySplashBinding;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final long MIN_SPLASH_TIME = 1500;
+    private static final long MIN_SPLASH_TIME = 1000; // Snappy 1-second delay
+    private static final int MAX_RETRIES = 3;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private ActivitySplashBinding binding;
-    private boolean isConnected = false;
-    private boolean hasMinTimePassed = false;
-    private boolean isNetworkCheckComplete = false;
+
+    private volatile boolean isConnected = false;
+    private volatile boolean hasMinTimePassed = false;
+    private volatile boolean isNetworkCheckComplete = false;
+    private volatile boolean isProceedingStarted = false;
     private boolean isActivityFinishing = false;
+    private int retryCount = 0;
+
+    private final Runnable networkTimeoutRunnable = () -> {
+        if (!isActivityFinishing) {
+            isNetworkCheckComplete = true;
+            isConnected = false;
+            checkAndProceed();
+        }
+    };
+
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Apply saved theme before onCreate
+        SharedPreferences prefs = getSharedPreferences("player_prefs", MODE_PRIVATE);
+        int savedTheme = prefs.getInt("app_theme", androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(savedTheme);
+
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this); // Modern full-bleed edge-to-edge
+
         binding = ActivitySplashBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Apply window insets for edge-to-edge support
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
+            Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            binding.progressBar.setTranslationY(-insets.bottom);
+            binding.errorLayout.setPadding(
+                    binding.errorLayout.getPaddingLeft(),
+                    binding.errorLayout.getPaddingTop() + insets.top,
+                    binding.errorLayout.getPaddingRight(),
+                    binding.errorLayout.getPaddingBottom() + insets.bottom
+            );
+            return windowInsets;
+        });
+
+        // Check for updates conditionally (only when online) to prevent library thread crashes
+        if (isNetworkConnected()) {
+            NextGenUpdater.checkForUpdates(this, true);
+        }
 
         setupRetryButton();
         startSplashSequence();
@@ -40,12 +84,31 @@ public class SplashActivity extends AppCompatActivity {
 
     private void setupRetryButton() {
         binding.btnRetry.setOnClickListener(v -> {
+            if (retryCount >= MAX_RETRIES) {
+                Toast.makeText(this, "Maximum retries reached. Please check your internet and restart.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            retryCount++;
+
             binding.errorLayout.setVisibility(View.GONE);
             binding.progressBar.setVisibility(View.VISIBLE);
 
             isConnected = false;
             hasMinTimePassed = false;
             isNetworkCheckComplete = false;
+            isProceedingStarted = false;
+
+            // Clean up previous callback and timeout before retrying
+            if (networkCallback != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                ConnectivityManager connectivityManager = (ConnectivityManager)
+                        getSystemService(CONNECTIVITY_SERVICE);
+                try {
+                    connectivityManager.unregisterNetworkCallback(networkCallback);
+                } catch (Exception ignored) {
+                }
+                networkCallback = null;
+            }
+            mainHandler.removeCallbacks(networkTimeoutRunnable);
 
             startSplashSequence();
         });
@@ -60,7 +123,28 @@ public class SplashActivity extends AppCompatActivity {
         checkNetworkConnection();
     }
 
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        if (cm == null) return false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Network activeNetwork = cm.getActiveNetwork();
+            if (activeNetwork == null) return false;
+            NetworkCapabilities capabilities = cm.getNetworkCapabilities(activeNetwork);
+            return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+        } else {
+            android.net.NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        }
+    }
+
     private void checkNetworkConnection() {
+        if (isNetworkConnected()) {
+            isConnected = true;
+            isNetworkCheckComplete = true;
+            checkAndProceed();
+            return;
+        }
+
         ConnectivityManager connectivityManager = (ConnectivityManager)
                 getSystemService(CONNECTIVITY_SERVICE);
 
@@ -69,73 +153,61 @@ public class SplashActivity extends AppCompatActivity {
                     .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
                     .build();
 
-            connectivityManager.registerNetworkCallback(networkRequest, new ConnectivityManager.NetworkCallback() {
+            networkCallback = new ConnectivityManager.NetworkCallback() {
                 @Override
                 public void onAvailable(@NonNull Network network) {
-                    if (!isNetworkCheckComplete && !isActivityFinishing) {
-                        isNetworkCheckComplete = true;
-                        isConnected = true;
-                        handleNetworkResult();
-                    }
+                    mainHandler.post(() -> {
+                        mainHandler.removeCallbacks(networkTimeoutRunnable);
+                        if (!isNetworkCheckComplete && !isActivityFinishing) {
+                            isNetworkCheckComplete = true;
+                            isConnected = true;
+                            checkAndProceed();
+                        }
+                    });
                 }
-
-                @Override
-                public void onUnavailable() {
-                    if (!isNetworkCheckComplete && !isActivityFinishing) {
-                        isNetworkCheckComplete = true;
-                        isConnected = false;
-                        handleNetworkResult();
-                    }
-                }
-            });
+            };
+            connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
+            mainHandler.postDelayed(networkTimeoutRunnable, 3000);
         } else {
-            android.net.NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-            isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
             isNetworkCheckComplete = true;
-            handleNetworkResult();
-        }
-    }
-
-    private void handleNetworkResult() {
-        if (isConnected) {
-            proceedToPlayerActivity();
-        } else {
-            showNoInternetError();
-        }
-    }
-
-    private void proceedToPlayerActivity() {
-        if (!isActivityFinishing && hasMinTimePassed && isConnected) {
-            SharedPreferences prefs = getSharedPreferences("player_prefs", MODE_PRIVATE);
-            boolean onboardingShown = prefs.getBoolean("onboarding_shown", false);
-
-            Intent intent;
-            if (!onboardingShown) {
-                intent = new Intent(SplashActivity.this, OnboardingActivity.class);
-            } else {
-                intent = new Intent(SplashActivity.this, MainActivity.class);
-            }
-
-            startActivity(intent);
-            isActivityFinishing = true;
-            finish();
-        } else if (!isActivityFinishing) {
-            mainHandler.postDelayed(this::proceedToPlayerActivity, 100);
-        }
-    }
-
-    private void showNoInternetError() {
-        if (!isActivityFinishing) {
-            binding.progressBar.setVisibility(View.GONE);
-            binding.errorLayout.setVisibility(View.VISIBLE);
-            Toast.makeText(this, R.string.error_check_connection, Toast.LENGTH_LONG).show();
+            isConnected = false;
+            checkAndProceed();
         }
     }
 
     private void checkAndProceed() {
-        if (isNetworkCheckComplete && hasMinTimePassed && isConnected && !isActivityFinishing) {
-            proceedToPlayerActivity();
+        if (isProceedingStarted || isActivityFinishing) return;
+
+        if (isNetworkCheckComplete && hasMinTimePassed) {
+            if (isConnected) {
+                isProceedingStarted = true;
+                proceedToNextActivity();
+            } else {
+                showNoInternetError();
+            }
         }
+    }
+
+    private void proceedToNextActivity() {
+        SharedPreferences prefs = getSharedPreferences("player_prefs", MODE_PRIVATE);
+        boolean onboardingShown = prefs.getBoolean("onboarding_shown", false);
+
+        Intent intent;
+        if (!onboardingShown) {
+            intent = new Intent(SplashActivity.this, OnboardingActivity.class);
+        } else {
+            intent = new Intent(SplashActivity.this, MainActivity.class);
+        }
+
+        startActivity(intent);
+        isActivityFinishing = true;
+        finish();
+    }
+
+    private void showNoInternetError() {
+        binding.progressBar.setVisibility(View.GONE);
+        binding.errorLayout.setVisibility(View.VISIBLE);
+        Toast.makeText(this, R.string.error_check_connection, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -143,5 +215,14 @@ public class SplashActivity extends AppCompatActivity {
         super.onDestroy();
         isActivityFinishing = true;
         mainHandler.removeCallbacksAndMessages(null);
+
+        if (networkCallback != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            ConnectivityManager connectivityManager = (ConnectivityManager)
+                    getSystemService(CONNECTIVITY_SERVICE);
+            try {
+                connectivityManager.unregisterNetworkCallback(networkCallback);
+            } catch (Exception ignored) {
+            }
+        }
     }
 }

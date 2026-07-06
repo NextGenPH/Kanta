@@ -79,6 +79,11 @@ public class OnboardingActivity extends AppCompatActivity {
         binding.btnSkip.setOnClickListener(v -> completeOnboarding());
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     private void completeOnboarding() {
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         prefs.edit().putBoolean(PREF_ONBOARDING_SHOWN, true).apply();

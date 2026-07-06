@@ -37,13 +37,11 @@
     <dimen name="text_medium">16sp</dimen>
     <dimen name="text_large">20sp</dimen>
     <dimen name="text_header">24sp</dimen>
-    <dimen name="text_title_splash">32sp</dimen>
+
 
     <!-- Icons -->
     <dimen name="icon_size_small">16dp</dimen>
-    <dimen name="icon_size_normal">24dp</dimen>
-    <dimen name="icon_size_large">32dp</dimen>
-    <dimen name="icon_size_huge">64dp</dimen>
+
     <dimen name="logo_size">120dp</dimen>
     <dimen name="onboarding_image_size">200dp</dimen>
 

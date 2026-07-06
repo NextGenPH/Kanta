@@ -6,14 +6,20 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.sns.kanta.BuildConfig;
-import com.sns.kanta.model.UpdateModel;
+import com.sns.kanta.core.Resource;
 import com.sns.kanta.model.VideoModel;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -28,26 +34,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class VideoRepository {
 
-    // ── Page sizes ────────────────────────────────────────────────────────────
     public static final int PAGE_SIZE = 50;
     private static final String TAG = "VideoRepository";
-    // ── Supabase ──────────────────────────────────────────────────────────────
-    private static final String SUPABASE_URL = "https://azjtejdxfqjwyxquszzm.supabase.co";
-    private static final String SUPABASE_KEY = BuildConfig.SUPABASE_ANON_KEY;
-    private static final String AUTH_HEADER = "Bearer " + SUPABASE_KEY;
-    // ── Select fields — includes artist + published_at ────────────────────────
-    private static final String SELECT_FIELDS =
-            "id,title,video_id,thumbnail,channel,created_at,artist,published_at";
+    private static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
+    private static final String SELECT_FIELDS = "id,title,video_id,thumbnail,channel,created_at,artist,published_at";
     private static final int RELATED_PAGE_SIZE = 30;
+    private static final Map<String, Long> playCountCache = new ConcurrentHashMap<>();
 
-    // ── Singleton ─────────────────────────────────────────────────────────────
     private static volatile VideoRepository instance;
-    // ── Dependencies ──────────────────────────────────────────────────────────
     private final ApiService apiService;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private final ExecutorService feedExecutor = Executors.newSingleThreadExecutor();
-    private final ExecutorService searchExecutor = Executors.newSingleThreadExecutor();
-    // ── Guards ────────────────────────────────────────────────────────────────
+    private final ExecutorService executor = Executors.newFixedThreadPool(4);
+
     private final AtomicBoolean isFetching = new AtomicBoolean(false);
     private volatile Call<List<VideoModel>> activeCall;
     private volatile Call<List<VideoModel>> activeArtistCall;
@@ -66,69 +64,73 @@ public final class VideoRepository {
         return instance;
     }
 
-    // ── Retrofit ──────────────────────────────────────────────────────────────
-
     private Retrofit buildRetrofit() {
-        OkHttpClient.Builder http = new OkHttpClient.Builder()
+        OkHttpClient.Builder client = new OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS)
-                .followSslRedirects(false);
-
-        if (BuildConfig.DEBUG) {
-            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
-            http.addInterceptor(logging);
-        }
+                .addInterceptor(new AuthInterceptor())
+                .addInterceptor(new HttpLoggingInterceptor().setLevel(
+                        BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE
+                ));
 
         return new Retrofit.Builder()
-                .baseUrl(SUPABASE_URL + "/")
-                .client(http.build())
+                .baseUrl(SUPABASE_URL)
+                .client(client.build())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
 
-    // ── Callback interface ────────────────────────────────────────────────────
-
     /**
-     * Fetch one page. Searches title AND artist columns simultaneously
-     * so voice/text search returns results from both.
+     * Modernized search method using LiveData and Resource wrapper.
      */
-    public void fetchPage(int offset, @NonNull String query,
-                          @NonNull PageCallback callback) {
+    public LiveData<Resource<List<VideoModel>>> searchVideos(String query, int offset) {
+        MutableLiveData<Resource<List<VideoModel>>> result = new MutableLiveData<>();
+        result.setValue(Resource.loading(null));
 
-        if (!isFetching.compareAndSet(false, true)) {
-            Log.d(TAG, "fetchPage ignored — already fetching");
-            return;
-        }
+        executor.execute(() -> {
+            try {
+                Call<List<VideoModel>> call = buildFeedCall(offset, query != null ? query : "");
+                Response<List<VideoModel>> response = call.execute();
+                if (response.isSuccessful() && response.body() != null) {
+                    result.postValue(Resource.success(sanitize(response.body())));
+                } else {
+                    result.postValue(Resource.error("Error: " + response.code(), null));
+                }
+            } catch (IOException e) {
+                if (!isCancellation(e)) {
+                    result.postValue(Resource.error(getHumanReadableError(e), null));
+                }
+            }
+        });
+        return result;
+    }
 
-        feedExecutor.execute(() -> {
+    private String getHumanReadableError(IOException e) {
+        if (e instanceof UnknownHostException) return "No Internet Connection";
+        if (e instanceof SocketTimeoutException) return "Connection Timeout";
+        return "Network Error Occurred";
+    }
+
+    public void fetchPage(int offset, @NonNull String query, @NonNull PageCallback callback) {
+        if (!isFetching.compareAndSet(false, true)) return;
+
+        executor.execute(() -> {
             try {
                 Call<List<VideoModel>> call = buildFeedCall(offset, query);
                 activeCall = call;
-
                 Response<List<VideoModel>> response = call.execute();
 
-                if (call.isCanceled()) {
-                    Log.d(TAG, "fetchPage cancelled");
-                    return;
-                }
+                if (call.isCanceled()) return;
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<VideoModel> safe = sanitize(response.body());
                     boolean hasMore = response.body().size() == PAGE_SIZE;
                     mainHandler.post(() -> callback.onSuccess(safe, hasMore));
                 } else {
-                    String err = "Server error " + response.code();
-                    Log.w(TAG, err);
-                    mainHandler.post(() -> callback.onError(err));
+                    handleError(response.code(), callback);
                 }
-
             } catch (IOException e) {
-                if (!isCancellation(e)) {
-                    Log.e(TAG, "fetchPage failed", e);
-                    mainHandler.post(() -> callback.onError("Network error"));
-                }
+                if (!isCancellation(e)) handleException(e, callback);
             } finally {
                 isFetching.set(false);
                 activeCall = null;
@@ -136,246 +138,294 @@ public final class VideoRepository {
         });
     }
 
-    public void cancelActive() {
-        Call<List<VideoModel>> call = activeCall;
-        if (call != null && !call.isCanceled()) call.cancel();
-        isFetching.set(false);
-        activeCall = null;
-        Log.d(TAG, "cancelActive — lock released");
-    }
-
-    // ── Main feed ─────────────────────────────────────────────────────────────
-
-    /**
-     * Fetch related songs.
-     * <p>
-     * Strategy:
-     * 1. If artist is non-empty → query the indexed `artist` column directly.
-     * This is fast (btree index on artist) and accurate.
-     * 2. If artist column returns 0 results → fall back to title ilike search.
-     * Handles legacy rows where artist column is still null.
-     */
-    public void fetchRelatedSongs(@NonNull String artist,
-                                  @Nullable String exclude,
-                                  @NonNull PageCallback callback) {
+    public void fetchRelatedSongs(@NonNull String artist, @Nullable List<String> excludeIds, @NonNull PageCallback callback) {
         cancelArtistSearch();
-
         String safe = artist.replaceAll("[()&|!<>=*%]", "").trim();
         if (safe.isEmpty()) {
             mainHandler.post(() -> callback.onSuccess(new ArrayList<>(), false));
             return;
         }
 
-        searchExecutor.execute(() -> {
+        executor.execute(() -> {
             try {
-                // ── Step 1: search by artist column ───────────────────────────
                 Call<List<VideoModel>> call = apiService.getVideosByArtist(
-                        SUPABASE_KEY, AUTH_HEADER,
-                        SELECT_FIELDS,
-                        "ilike.*" + safe + "*",
-                        "created_at.desc",
-                        RELATED_PAGE_SIZE,
-                        0);
+                        BuildConfig.SUPABASE_ANON_KEY, "Bearer " + BuildConfig.SUPABASE_ANON_KEY,
+                        SELECT_FIELDS, "ilike.*" + safe + "*", "created_at.desc", RELATED_PAGE_SIZE, 0);
 
                 activeArtistCall = call;
                 Response<List<VideoModel>> response = call.execute();
 
                 if (call.isCanceled()) return;
 
-                if (response.isSuccessful() && response.body() != null
-                        && !response.body().isEmpty()) {
-                    // Artist column hit — use these results
-                    List<VideoModel> filtered = excludeCurrent(
-                            sanitize(response.body()), exclude);
-                    mainHandler.post(() -> callback.onSuccess(filtered, false));
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                    mainHandler.post(() -> callback.onSuccess(filterExcluded(sanitize(response.body()), excludeIds), false));
                     return;
                 }
 
-                // ── Step 2: title ilike fallback ──────────────────────────────
-                Log.d(TAG, "artist column empty, falling back to title search");
+                // Fallback search
                 Call<List<VideoModel>> fallback = apiService.getVideosFiltered(
-                        SUPABASE_KEY, AUTH_HEADER,
-                        SELECT_FIELDS,
-                        "ilike.*" + safe + "*",
-                        "created_at.desc",
-                        RELATED_PAGE_SIZE,
-                        0);
+                        BuildConfig.SUPABASE_ANON_KEY, "Bearer " + BuildConfig.SUPABASE_ANON_KEY,
+                        SELECT_FIELDS, "ilike.*" + safe + "*", "created_at.desc", RELATED_PAGE_SIZE, 0);
 
                 activeArtistCall = fallback;
                 Response<List<VideoModel>> fbResponse = fallback.execute();
 
-                if (fallback.isCanceled()) return;
-
                 if (fbResponse.isSuccessful() && fbResponse.body() != null) {
-                    List<VideoModel> filtered = excludeCurrent(
-                            sanitize(fbResponse.body()), exclude);
-                    mainHandler.post(() -> callback.onSuccess(filtered, false));
+                    mainHandler.post(() -> callback.onSuccess(filterExcluded(sanitize(fbResponse.body()), excludeIds), false));
                 } else {
-                    mainHandler.post(() -> callback.onSuccess(new ArrayList<>(), false));
+                    handleError(fbResponse.code(), callback);
                 }
-
             } catch (IOException e) {
-                if (!isCancellation(e)) {
-                    Log.e(TAG, "fetchRelatedSongs failed", e);
-                    mainHandler.post(() -> callback.onError("Network error"));
-                }
+                if (!isCancellation(e)) handleException(e, callback);
             } finally {
                 activeArtistCall = null;
             }
         });
     }
 
-    public void cancelArtistSearch() {
-        Call<List<VideoModel>> call = activeArtistCall;
-        if (call != null && !call.isCanceled()) call.cancel();
-        activeArtistCall = null;
-    }
-
-    // ── Related songs — artist column first, title fallback ───────────────────
-
-    public void fetchVideoById(@NonNull String videoId,
-                               @NonNull SingleVideoCallback callback) {
-        searchExecutor.execute(() -> {
+    public void fetchTrendingSongs(int offset, @NonNull PageCallback callback) {
+        executor.execute(() -> {
             try {
-                Call<List<VideoModel>> call = apiService.getVideosByVideoId(
-                        SUPABASE_KEY, AUTH_HEADER,
-                        SELECT_FIELDS,
-                        "eq." + videoId,
-                        1, 0);
-
+                // trending_songs view: top 10 songs played in the last 7 days, sorted by play_count desc
+                Call<List<VideoModel>> call = apiService.getTrendingSongs(
+                        BuildConfig.SUPABASE_ANON_KEY, "Bearer " + BuildConfig.SUPABASE_ANON_KEY, "*");
                 Response<List<VideoModel>> response = call.execute();
-
-                if (response.isSuccessful()
-                        && response.body() != null
-                        && !response.body().isEmpty()) {
-                    mainHandler.post(() -> callback.onSuccess(response.body().get(0)));
+                if (response.isSuccessful() && response.body() != null) {
+                    List<VideoModel> safe = sanitize(response.body());
+                    // trending_songs view is LIMIT 10 by definition — no more pages
+                    mainHandler.post(() -> callback.onSuccess(safe, false));
                 } else {
-                    mainHandler.post(() -> callback.onSuccess(null));
+                    handleError(response.code(), callback);
                 }
             } catch (IOException e) {
-                mainHandler.post(() -> callback.onError(
-                        e.getMessage() != null ? e.getMessage() : "Unknown error"));
+                handleException(e, callback);
             }
         });
+    }
+
+    /**
+     * Fetches the trending_songs view ordered by all-time play_count (no date window).
+     * Used for the "Popular" chip — shows the most-played songs overall.
+     */
+    public void fetchTrendingByPopularity(int offset, @NonNull PageCallback callback) {
+        executor.execute(() -> {
+            try {
+                // trending_songs view already has play_count — order by it descending
+                Call<List<VideoModel>> call = apiService.getTrendingSongsPaged(
+                        BuildConfig.SUPABASE_ANON_KEY, "Bearer " + BuildConfig.SUPABASE_ANON_KEY,
+                        "*", "play_count.desc", PAGE_SIZE, offset);
+                Response<List<VideoModel>> response = call.execute();
+                if (response.isSuccessful() && response.body() != null) {
+                    List<VideoModel> safe = sanitize(response.body());
+                    boolean hasMore = response.body().size() == PAGE_SIZE;
+                    mainHandler.post(() -> callback.onSuccess(safe, hasMore));
+                } else {
+                    handleError(response.code(), callback);
+                }
+            } catch (IOException e) {
+                handleException(e, callback);
+            }
+        });
+    }
+
+    public void fetchOrderedSongs(@NonNull String order, int offset, @NonNull PageCallback callback) {
+        executor.execute(() -> {
+            try {
+                Call<List<VideoModel>> call = apiService.getVideos(
+                        BuildConfig.SUPABASE_ANON_KEY, "Bearer " + BuildConfig.SUPABASE_ANON_KEY,
+                        SELECT_FIELDS, order, PAGE_SIZE, offset);
+                Response<List<VideoModel>> response = call.execute();
+                if (response.isSuccessful() && response.body() != null) {
+                    List<VideoModel> safe = sanitize(response.body());
+                    boolean hasMore = response.body().size() == PAGE_SIZE;
+                    mainHandler.post(() -> callback.onSuccess(safe, hasMore));
+                } else {
+                    handleError(response.code(), callback);
+                }
+            } catch (IOException e) {
+                handleException(e, callback);
+            }
+        });
+    }
+
+    public void fetchArtistSongs(@NonNull String artist, int offset, @NonNull PageCallback callback) {
+        String safeArtist = artist.replaceAll("[()&|!<>=*%]", "").trim();
+        executor.execute(() -> {
+            try {
+                Call<List<VideoModel>> call = apiService.getVideosByArtist(
+                        BuildConfig.SUPABASE_ANON_KEY, "Bearer " + BuildConfig.SUPABASE_ANON_KEY,
+                        SELECT_FIELDS, "ilike.*" + safeArtist + "*", "created_at.desc", PAGE_SIZE, offset);
+                Response<List<VideoModel>> response = call.execute();
+                if (response.isSuccessful() && response.body() != null) {
+                    List<VideoModel> safe = sanitize(response.body());
+                    boolean hasMore = response.body().size() == PAGE_SIZE;
+                    mainHandler.post(() -> callback.onSuccess(safe, hasMore));
+                } else {
+                    handleError(response.code(), callback);
+                }
+            } catch (IOException e) {
+                handleException(e, callback);
+            }
+        });
+    }
+
+    public void recordSongPlay(@NonNull String videoId, @NonNull RecordPlayCallback callback) {
+        executor.execute(() -> {
+            try {
+                java.util.Map<String, String> body = new java.util.HashMap<>();
+                body.put("video_id", videoId);
+                Response<Void> response = apiService.recordPlay(BuildConfig.SUPABASE_ANON_KEY, "Bearer " + BuildConfig.SUPABASE_ANON_KEY, body).execute();
+                if (response.isSuccessful()) {
+                    Long current = playCountCache.get(videoId);
+                    if (current != null) {
+                        playCountCache.put(videoId, current + 1);
+                    }
+                }
+            } catch (IOException e) {
+                Log.w(TAG, "Failed to record play", e);
+            } finally {
+                mainHandler.post(callback::onProcessed);
+            }
+        });
+    }
+
+    private Call<List<VideoModel>> buildFeedCall(int offset, @NonNull String query) {
+        String apiKey = BuildConfig.SUPABASE_ANON_KEY;
+        String auth = "Bearer " + apiKey;
+        if (query.isEmpty()) {
+            return apiService.getVideos(apiKey, auth, SELECT_FIELDS, "created_at.desc", PAGE_SIZE, offset);
+        }
+        String safe = query.replaceAll("[()&|!<>=*%]", "").trim();
+        String orFilter = "(title.ilike.*" + safe + "*,artist.ilike.*" + safe + "*)";
+        return apiService.searchVideosByTitleOrArtist(apiKey, auth, SELECT_FIELDS, orFilter, "created_at.desc", PAGE_SIZE, offset);
+    }
+
+    private void handleError(int code, PageCallback callback) {
+        String msg = (code == 401 || code == 403) ? "Auth Error" : (code >= 500 ? "Server Error" : "Error (" + code + ")");
+        mainHandler.post(() -> callback.onError(msg));
+    }
+
+    private void handleException(IOException e, PageCallback callback) {
+        String msg = (e instanceof UnknownHostException) ? "No Internet" : (e instanceof SocketTimeoutException ? "Timeout" : "Network Error");
+        mainHandler.post(() -> callback.onError(msg));
+    }
+
+    private List<VideoModel> sanitize(List<VideoModel> raw) {
+        List<VideoModel> clean = new ArrayList<>();
+        if (raw == null) return clean;
+        for (VideoModel v : raw) {
+            if (v != null && v.getVideoId() != null && !v.getVideoId().isEmpty()) {
+                if (v.getPlayCount() != null) {
+                    playCountCache.put(v.getVideoId(), v.getPlayCount());
+                } else {
+                    Long cachedCount = playCountCache.get(v.getVideoId());
+                    if (cachedCount != null) {
+                        v = new VideoModel(
+                                v.getVideoId(),
+                                v.getTitle(),
+                                v.getChannel(),
+                                v.getThumbnail(),
+                                v.getArtist(),
+                                v.getPublishedAt(),
+                                v.getCreatedAt(),
+                                cachedCount
+                        );
+                    }
+                }
+                clean.add(v);
+            }
+        }
+        return clean;
+    }
+
+    private List<VideoModel> filterExcluded(List<VideoModel> videos, List<String> excludeIds) {
+        if (excludeIds == null || excludeIds.isEmpty()) return videos;
+        List<VideoModel> result = new ArrayList<>();
+        for (VideoModel v : videos) {
+            if (!excludeIds.contains(v.getVideoId())) {
+                result.add(v);
+            }
+        }
+        return result;
+    }
+
+    private boolean isCancellation(IOException e) {
+        return e.getMessage() != null && (e.getMessage().equals("Canceled") || e.getMessage().equals("Socket closed"));
+    }
+
+    public void cancelActive() {
+        if (activeCall != null) activeCall.cancel();
+    }
+
+    public void cancelArtistSearch() {
+        if (activeArtistCall != null) activeArtistCall.cancel();
     }
 
     public ApiService getApiService() {
         return apiService;
     }
 
-    // ── Single video lookup ───────────────────────────────────────────────────
-
-    public void shutdown() {
-        cancelActive();
-        cancelArtistSearch();
-        feedExecutor.shutdownNow();
-        searchExecutor.shutdownNow();
+    public String getSupabaseKey() {
+        return BuildConfig.SUPABASE_ANON_KEY;
     }
 
-    // ── ApiService accessor (for UpdateManager) ───────────────────────────────
-
-    /**
-     * For empty query: plain getVideos.
-     * For non-empty query: search title OR artist simultaneously using
-     * Supabase's `or` filter so one request covers both columns.
-     */
-    @NonNull
-    private Call<List<VideoModel>> buildFeedCall(int offset, @NonNull String query) {
-        if (query.isEmpty()) {
-            return apiService.getVideos(
-                    SUPABASE_KEY, AUTH_HEADER,
-                    SELECT_FIELDS,
-                    "created_at.desc",
-                    PAGE_SIZE,
-                    offset);
-        }
-
-        String safe = query.replaceAll("[()&|!<>=*%]", "").trim();
-        if (safe.isEmpty()) {
-            return apiService.getVideos(
-                    SUPABASE_KEY, AUTH_HEADER,
-                    SELECT_FIELDS,
-                    "created_at.desc",
-                    PAGE_SIZE,
-                    offset);
-        }
-
-        // Search title OR artist in one request
-        // Supabase or() syntax: (title.ilike.*term*,artist.ilike.*term*)
-        String orFilter = "(title.ilike.*" + safe + "*,artist.ilike.*" + safe + "*)";
-        return apiService.searchVideosByTitleOrArtist(
-                SUPABASE_KEY, AUTH_HEADER,
-                SELECT_FIELDS,
-                orFilter,
-                "created_at.desc",
-                PAGE_SIZE,
-                offset);
-    }
-
-    // ── Shutdown ──────────────────────────────────────────────────────────────
-
-    @NonNull
-    private List<VideoModel> excludeCurrent(@NonNull List<VideoModel> videos,
-                                            @Nullable String excludeId) {
-        if (excludeId == null || excludeId.isEmpty()) return videos;
-        List<VideoModel> result = new ArrayList<>();
-        for (VideoModel v : videos) {
-            if (!excludeId.equals(v.getVideoId())) result.add(v);
-        }
-        return result;
-    }
-
-    // ── Internal ──────────────────────────────────────────────────────────────
-
-    @NonNull
-    private List<VideoModel> sanitize(@NonNull List<VideoModel> raw) {
-        List<VideoModel> clean = new ArrayList<>();
-        for (VideoModel v : raw) {
-            if (v == null) continue;
-            if (v.getVideoId() == null || v.getVideoId().isEmpty()) continue;
-            if (v.getTitle() == null || v.getTitle().isEmpty()) continue;
-            clean.add(v);
-        }
-        return clean;
-    }
-
-    private boolean isCancellation(@NonNull IOException e) {
-        String msg = e.getMessage();
-        return msg != null && (msg.equals("Canceled") || msg.equals("Socket closed"));
-    }
-
-    public void fetchLatestVersion(@NonNull UpdateCallback callback) {
-        searchExecutor.execute(() -> {
+    public void fetchVideoDetails(@NonNull String videoId, @NonNull VideoDetailsCallback callback) {
+        executor.execute(() -> {
             try {
-                Call<List<UpdateModel>> call = apiService.getLatestVersion(
-                        SUPABASE_KEY, AUTH_HEADER, "*", "version_code.desc", 1);
-                Response<List<UpdateModel>> response = call.execute();
+                Call<List<VideoModel>> call = apiService.getVideoDetails(
+                        BuildConfig.SUPABASE_ANON_KEY, "Bearer " + BuildConfig.SUPABASE_ANON_KEY,
+                        SELECT_FIELDS, "eq." + videoId
+                );
+                Response<List<VideoModel>> response = call.execute();
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
-                    mainHandler.post(() -> callback.onSuccess(response.body().get(0)));
+                    VideoModel video = response.body().get(0);
+
+                    // Fetch trending (play_count) information
+                    Call<List<VideoModel>> trendingCall = apiService.getTrendingSongsFiltered(
+                            BuildConfig.SUPABASE_ANON_KEY, "Bearer " + BuildConfig.SUPABASE_ANON_KEY,
+                            "*", "eq." + videoId
+                    );
+                    Response<List<VideoModel>> trendingResponse = trendingCall.execute();
+                    Long playCount = 0L;
+                    if (trendingResponse.isSuccessful() && trendingResponse.body() != null && !trendingResponse.body().isEmpty()) {
+                        playCount = trendingResponse.body().get(0).getPlayCount();
+                    }
+
+                    playCountCache.put(video.getVideoId(), playCount);
+
+                    VideoModel fullVideo = new VideoModel(
+                            video.getVideoId(),
+                            video.getTitle(),
+                            video.getChannel(),
+                            video.getThumbnail(),
+                            video.getArtist(),
+                            video.getPublishedAt(),
+                            video.getCreatedAt(),
+                            playCount
+                    );
+                    mainHandler.post(() -> callback.onSuccess(fullVideo));
                 } else {
-                    mainHandler.post(() -> callback.onError("Failed to fetch update info"));
+                    mainHandler.post(() -> callback.onError("Video details not found"));
                 }
             } catch (IOException e) {
-                mainHandler.post(() -> callback.onError("Network error"));
+                if (!isCancellation(e)) {
+                    mainHandler.post(() -> callback.onError(getHumanReadableError(e)));
+                }
             }
         });
     }
 
     public interface PageCallback {
         void onSuccess(List<VideoModel> videos, boolean hasMore);
-
         void onError(String message);
     }
 
-    public interface SingleVideoCallback {
-        void onSuccess(@Nullable VideoModel video);
-
+    public interface VideoDetailsCallback {
+        void onSuccess(VideoModel video);
         void onError(String message);
     }
 
-    public interface UpdateCallback {
-        void onSuccess(UpdateModel update);
-
-        void onError(String message);
+    public interface RecordPlayCallback {
+        void onProcessed();
     }
 }

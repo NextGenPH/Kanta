@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,7 +16,6 @@ import com.bumptech.glide.Glide;
 import com.sns.kanta.R;
 import com.sns.kanta.model.VideoModel;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,43 +23,27 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
 
     private final Context context;
     private final OnPlayClickListener playClickListener;
-    private final OnFavoriteLongClickListener favoriteLongClickListener;
 
-    private List<VideoModel> videoList;
+    private final AsyncListDiffer<VideoModel> differ = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<VideoModel>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull VideoModel oldItem, @NonNull VideoModel newItem) {
+            return Objects.equals(oldItem.getVideoId(), newItem.getVideoId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull VideoModel oldItem, @NonNull VideoModel newItem) {
+            return Objects.equals(oldItem, newItem);
+        }
+    });
 
     public SearchResultAdapter(@NonNull Context context,
-                               @NonNull OnPlayClickListener playListener,
-                               @NonNull OnFavoriteLongClickListener favoriteListener) {
+                               @NonNull OnPlayClickListener playListener) {
         this.context = context;
-        this.videoList = new ArrayList<>();
         this.playClickListener = playListener;
-        this.favoriteLongClickListener = favoriteListener;
     }
 
     public void updateResults(@NonNull List<VideoModel> newVideos) {
-        DiffUtil.DiffResult diff = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-            @Override
-            public int getOldListSize() {
-                return videoList.size();
-            }
-
-            @Override
-            public int getNewListSize() {
-                return newVideos.size();
-            }
-
-            @Override
-            public boolean areItemsTheSame(int oldPos, int newPos) {
-                return Objects.equals(videoList.get(oldPos).getVideoId(), newVideos.get(newPos).getVideoId());
-            }
-
-            @Override
-            public boolean areContentsTheSame(int oldPos, int newPos) {
-                return Objects.equals(videoList.get(oldPos).getVideoId(), newVideos.get(newPos).getVideoId());
-            }
-        });
-        this.videoList = new ArrayList<>(newVideos);
-        diff.dispatchUpdatesTo(this);
+        differ.submitList(newVideos);
     }
 
     @NonNull
@@ -71,9 +55,33 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        VideoModel video = videoList.get(position);
+        VideoModel video = differ.getCurrentList().get(position);
         holder.title.setText(video.getTitle());
-        holder.channel.setText(video.getChannel());
+        holder.tvChannelName.setText(video.getArtistOrChannel());
+
+        Long playCount = video.getPlayCount();
+        if (playCount != null && playCount > 0) {
+            holder.tvPlayCount.setText(formatPlayCount(playCount) + " plays");
+            holder.ivPlayCount.setVisibility(View.VISIBLE);
+            holder.tvPlayCount.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvPlayCount.setText("0 plays");
+            holder.ivPlayCount.setVisibility(View.VISIBLE);
+            holder.tvPlayCount.setVisibility(View.VISIBLE);
+        }
+
+        String rawDate = video.getPublishedAt();
+        if (rawDate == null || rawDate.isEmpty()) {
+            rawDate = video.getCreatedAt();
+        }
+        if (rawDate != null && !rawDate.isEmpty()) {
+            holder.tvPublishedDate.setText(com.sns.kanta.helper.TimeUtils.getRelativeTime(rawDate));
+            holder.ivCalendar.setVisibility(View.VISIBLE);
+            holder.tvPublishedDate.setVisibility(View.VISIBLE);
+        } else {
+            holder.ivCalendar.setVisibility(View.GONE);
+            holder.tvPublishedDate.setVisibility(View.GONE);
+        }
 
         Glide.with(context)
                 .load(video.getThumbnail())
@@ -83,36 +91,46 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
                 .into(holder.thumbnail);
 
         holder.itemView.setOnClickListener(v -> playClickListener.onPlayClick(video));
+        if (holder.btnMenu != null) {
+            holder.btnMenu.setOnClickListener(v -> com.sns.kanta.helper.MenuUtils.showMediaItemMenu(context, v, video));
+        }
+    }
 
-        holder.itemView.setOnLongClickListener(v -> {
-            favoriteLongClickListener.onFavoriteLongClick(video);
-            return true;
-        });
+    private String formatPlayCount(long count) {
+        if (count < 1000) return String.valueOf(count);
+        if (count < 1000000) return String.format(java.util.Locale.US, "%.1fK", count / 1000.0);
+        return String.format(java.util.Locale.US, "%.1fM", count / 1000000.0);
     }
 
     @Override
     public int getItemCount() {
-        return videoList.size();
+        return differ.getCurrentList().size();
     }
 
     public interface OnPlayClickListener {
         void onPlayClick(VideoModel video);
     }
 
-    public interface OnFavoriteLongClickListener {
-        void onFavoriteLongClick(VideoModel video);
-    }
-
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView thumbnail;
         TextView title;
-        TextView channel;
+        TextView tvChannelName;
+        TextView tvPlayCount;
+        TextView tvPublishedDate;
+        View ivPlayCount;
+        View ivCalendar;
+        View btnMenu;
 
         ViewHolder(View itemView) {
             super(itemView);
             thumbnail = itemView.findViewById(R.id.thumbnail);
             title = itemView.findViewById(R.id.title);
-            channel = itemView.findViewById(R.id.channel);
+            tvChannelName = itemView.findViewById(R.id.tvChannelName);
+            tvPlayCount = itemView.findViewById(R.id.tvPlayCount);
+            tvPublishedDate = itemView.findViewById(R.id.tvPublishedDate);
+            ivPlayCount = itemView.findViewById(R.id.ivPlayCount);
+            ivCalendar = itemView.findViewById(R.id.ivCalendar);
+            btnMenu = itemView.findViewById(R.id.btnMenu);
         }
     }
 }

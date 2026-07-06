@@ -5,6 +5,7 @@
     <color name="bg_primary">#F8FAFC</color>
     <color name="bg_surface">#FFFFFF</color>
     <color name="bg_surface2">#F1F5F9</color>
+    <color name="surface_translucent">#D9FFFFFF</color>
 
     <!-- ── Borders / dividers ────────────────────────────────────────────── -->
     <color name="divider">#E2E8F0</color>
@@ -21,5 +22,6 @@
 
     <!-- ── Ripple ────────────────────────────────────────────────────────── -->
     <color name="ripple_green">#1A2ECC71</color>
+    <color name="shimmer_background">#E2E8F0</color>
 
 </resources>

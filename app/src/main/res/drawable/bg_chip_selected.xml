@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Solid dark background for selected state (YouTube standard) -->
+    <solid android:color="@color/bg_primary" />
+    <!-- Fully rounded pill shape -->
+    <corners android:radius="100dp" />
+</shape>

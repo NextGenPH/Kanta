@@ -13,7 +13,6 @@ import com.sns.kanta.model.ReservationModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Simplified Manager for v1.6.
@@ -79,14 +78,6 @@ public final class QueueManager {
         persist();
     }
 
-    public synchronized void clearQueue() {
-        if (!queue.isEmpty()) {
-            ReservationModel current = queue.remove(0);
-            addToHistory(current);
-        }
-        persist();
-    }
-
     private void addToHistory(ReservationModel item) {
         history.remove(item);
         history.add(0, item);
@@ -105,10 +96,5 @@ public final class QueueManager {
     @Nullable
     public synchronized ReservationModel getNowPlaying() {
         return queue.isEmpty() ? null : queue.get(0);
-    }
-
-    public synchronized boolean isInQueue(@Nullable String videoId) {
-        if (videoId == null || queue.isEmpty()) return false;
-        return Objects.equals(videoId, queue.get(0).getVideoId());
     }
 }

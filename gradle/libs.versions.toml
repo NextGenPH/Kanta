@@ -6,18 +6,28 @@ junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 appcompat = "1.7.1"
-loggingInterceptor = "5.3.2"
+loggingInterceptor = "5.4.0"
 material = "1.14.0"
 activityKtx = "1.13.0"
 constraintlayout = "2.2.1"
+nextgenupdater = "1.0.0"
 retrofit = "3.0.0"
 swiperefreshlayout = "1.2.0"
-lifecycle = "2.10.0"
-mediarouter = "1.8.1"
-playServicesCast = "22.3.1"
-chromecastSender = "0.32"
+lifecycle = "2.11.0"
+room = "2.8.4"
+palette = "1.0.0"
+glide-transformations = "4.3.0"
+shimmer = "0.5.0"
+securityCrypto = "1.1.0"
 
 [libraries]
+security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
+shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
+glide-transformations = { module = "jp.wasabeef:glide-transformations", version.ref = "glide-transformations" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+nextgenupdater = { module = "com.github.NextGenPH:NextGenUpdater", version.ref = "nextgenupdater" }
+palette = { group = "androidx.palette", name = "palette", version.ref = "palette" }
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 core = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "core" }
@@ -34,9 +44,7 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
-mediarouter = { group = "androidx.mediarouter", name = "mediarouter", version.ref = "mediarouter" }
-play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "playServicesCast" }
-chromecast-sender = { group = "com.pierfrancescosoffritti.androidyoutubeplayer", name = "chromecast-sender", version.ref = "chromecastSender" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

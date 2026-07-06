@@ -26,4 +26,14 @@
         android:textColor="@color/text_primary"
         android:textSize="@dimen/text_normal" />
 
+    <ImageView
+        android:id="@+id/btnRemoveHistory"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/btn_clear"
+        android:padding="10dp"
+        android:src="@drawable/ic_close"
+        app:tint="@color/text_secondary" />
+
 </LinearLayout>
