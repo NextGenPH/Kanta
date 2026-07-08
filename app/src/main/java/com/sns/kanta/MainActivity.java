@@ -4,10 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -47,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         remoteManager = RemoteManager.getInstance();
 
+        setupWindowInsets();
         setupToolbar();
         setupFeed();
         setupFilters();
@@ -55,6 +61,44 @@ public class MainActivity extends AppCompatActivity {
         setupMiniPlayer();
         setupBackPressedHandler();
         observeViewModel();
+    }
+
+    private void setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
+            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
+            
+            // For AppBarLayout, we handle top insets (status bar + notch)
+            int topInset = Math.max(systemBars.top, displayCutout.top);
+            binding.appBarLayout.setPadding(
+                binding.appBarLayout.getPaddingLeft(),
+                topInset,
+                binding.appBarLayout.getPaddingRight(),
+                binding.appBarLayout.getPaddingBottom()
+            );
+            
+            // For bottomContainer, we handle bottom insets (nav bar)
+            binding.bottomContainer.setPadding(
+                binding.bottomContainer.getPaddingLeft(),
+                binding.bottomContainer.getPaddingTop(),
+                binding.bottomContainer.getPaddingRight(),
+                systemBars.bottom
+            );
+            
+            // RecyclerView needs padding to clear the bottom UI + system nav bar
+            int baseBottomPadding = (int) (76 * getResources().getDisplayMetrics().density);
+            binding.rvRecentSongs.setPadding(
+                binding.rvRecentSongs.getPaddingLeft(),
+                binding.rvRecentSongs.getPaddingTop(),
+                binding.rvRecentSongs.getPaddingRight(),
+                baseBottomPadding + systemBars.bottom
+            );
+            
+            // Apply horizontal safe areas (notches in landscape)
+            binding.coordinatorLayout.setPadding(systemBars.left, 0, systemBars.right, 0);
+            
+            return WindowInsetsCompat.CONSUMED;
+        });
     }
 
     private void setupMiniPlayer() {

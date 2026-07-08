@@ -80,8 +80,8 @@
                     android:id="@+id/ivPlayCount"
                     android:layout_width="12dp"
                     android:layout_height="12dp"
-                    android:src="@drawable/ic_play_count"
                     android:contentDescription="@null"
+                    android:src="@drawable/ic_play_count"
                     app:tint="@color/text_secondary" />
 
                 <TextView
@@ -98,8 +98,8 @@
                     android:layout_width="12dp"
                     android:layout_height="12dp"
                     android:layout_marginStart="12dp"
-                    android:src="@drawable/ic_calendar"
                     android:contentDescription="@null"
+                    android:src="@drawable/ic_calendar"
                     app:tint="@color/text_secondary" />
 
                 <TextView

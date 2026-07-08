@@ -10,6 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
@@ -28,9 +32,12 @@ public class OnboardingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         binding = ActivityOnboardingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        setupWindowInsets();
 
         List<OnboardingItem> items = new ArrayList<>();
         items.add(new OnboardingItem(
@@ -77,6 +84,31 @@ public class OnboardingActivity extends AppCompatActivity {
         });
 
         binding.btnSkip.setOnClickListener(v -> completeOnboarding());
+    }
+
+    private void setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
+            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
+
+            int topSafe = Math.max(systemBars.top, displayCutout.top);
+            int bottomSafe = systemBars.bottom;
+            
+            ViewGroup.MarginLayoutParams skipLp = (ViewGroup.MarginLayoutParams) binding.btnSkip.getLayoutParams();
+            int baseSkipMargin = (int) (16 * getResources().getDisplayMetrics().density);
+            skipLp.topMargin = baseSkipMargin + topSafe;
+            binding.btnSkip.setLayoutParams(skipLp);
+            
+            ViewGroup.MarginLayoutParams nextLp = (ViewGroup.MarginLayoutParams) binding.btnNext.getLayoutParams();
+            int baseNextMargin = (int) (24 * getResources().getDisplayMetrics().density);
+            nextLp.bottomMargin = baseNextMargin + bottomSafe;
+            binding.btnNext.setLayoutParams(nextLp);
+            
+            // Side insets for landscape
+            binding.getRoot().setPadding(systemBars.left, 0, systemBars.right, 0);
+
+            return WindowInsetsCompat.CONSUMED;
+        });
     }
 
     @Override

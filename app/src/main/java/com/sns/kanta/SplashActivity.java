@@ -35,8 +35,6 @@ public class SplashActivity extends AppCompatActivity {
     private volatile boolean isNetworkCheckComplete = false;
     private volatile boolean isProceedingStarted = false;
     private boolean isActivityFinishing = false;
-    private int retryCount = 0;
-
     private final Runnable networkTimeoutRunnable = () -> {
         if (!isActivityFinishing) {
             isNetworkCheckComplete = true;
@@ -44,7 +42,7 @@ public class SplashActivity extends AppCompatActivity {
             checkAndProceed();
         }
     };
-
+    private int retryCount = 0;
     private ConnectivityManager.NetworkCallback networkCallback;
 
     @Override
@@ -63,14 +61,22 @@ public class SplashActivity extends AppCompatActivity {
         // Apply window insets for edge-to-edge support
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
             Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-            binding.progressBar.setTranslationY(-insets.bottom);
+            Insets cutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
+            
+            int topSafe = Math.max(insets.top, cutout.top);
+            int bottomSafe = insets.bottom;
+            
+            binding.progressBar.setTranslationY(-bottomSafe);
             binding.errorLayout.setPadding(
                     binding.errorLayout.getPaddingLeft(),
-                    binding.errorLayout.getPaddingTop() + insets.top,
+                    binding.errorLayout.getPaddingTop() + topSafe,
                     binding.errorLayout.getPaddingRight(),
-                    binding.errorLayout.getPaddingBottom() + insets.bottom
+                    binding.errorLayout.getPaddingBottom() + bottomSafe
             );
-            return windowInsets;
+            
+            v.setPadding(insets.left, 0, insets.right, 0);
+            
+            return WindowInsetsCompat.CONSUMED;
         });
 
         // Check for updates conditionally (only when online) to prevent library thread crashes

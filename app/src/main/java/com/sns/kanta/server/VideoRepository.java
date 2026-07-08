@@ -417,11 +417,13 @@ public final class VideoRepository {
 
     public interface PageCallback {
         void onSuccess(List<VideoModel> videos, boolean hasMore);
+
         void onError(String message);
     }
 
     public interface VideoDetailsCallback {
         void onSuccess(VideoModel video);
+
         void onError(String message);
     }
 

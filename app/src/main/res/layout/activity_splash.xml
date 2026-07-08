@@ -32,10 +32,10 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="64dp"
         android:indeterminate="true"
+        android:visibility="visible"
         app:indicatorColor="?attr/colorPrimary"
-        app:trackThickness="3dp"
         app:indicatorSize="32dp"
-        android:visibility="visible" />
+        app:trackThickness="3dp" />
 
     <!-- Error Overlay (Hidden by default, styled like standard Google apps error screen) -->
     <LinearLayout
@@ -58,20 +58,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:gravity="center"
             android:text="@string/error_no_internet"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:gravity="center" />
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:gravity="center"
             android:text="@string/error_check_connection"
             android:textColor="@color/text_secondary"
-            android:textSize="14sp"
-            android:gravity="center" />
+            android:textSize="14sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRetry"

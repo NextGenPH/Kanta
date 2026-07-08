@@ -7,6 +7,11 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import android.view.ViewGroup;
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,6 +48,7 @@ public class RemoteActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         binding = ActivityRemoteBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -55,10 +61,45 @@ public class RemoteActivity extends AppCompatActivity
             return;
         }
 
+        setupWindowInsets();
         setupUI();
         observeViewModel();
 
         viewModel.loadTrendingSongs();
+    }
+
+    private void setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
+            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
+            
+            int topInset = Math.max(systemBars.top, displayCutout.top);
+            
+            binding.mainContentLayout.setPadding(
+                binding.mainContentLayout.getPaddingLeft(),
+                topInset,
+                binding.mainContentLayout.getPaddingRight(),
+                binding.mainContentLayout.getPaddingBottom()
+            );
+            
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) binding.floatingControlsLayout.getLayoutParams();
+            int baseMargin = (int) (16 * getResources().getDisplayMetrics().density);
+            lp.bottomMargin = baseMargin + systemBars.bottom;
+            binding.floatingControlsLayout.setLayoutParams(lp);
+            
+            int baseScrollPadding = (int) (100 * getResources().getDisplayMetrics().density);
+            binding.nestedScrollView.setPadding(
+                binding.nestedScrollView.getPaddingLeft(),
+                binding.nestedScrollView.getPaddingTop(),
+                binding.nestedScrollView.getPaddingRight(),
+                baseScrollPadding + systemBars.bottom
+            );
+            
+            // Side insets for landscape
+            binding.coordinatorLayout.setPadding(systemBars.left, 0, systemBars.right, 0);
+            
+            return WindowInsetsCompat.CONSUMED;
+        });
     }
 
     private void setupUI() {

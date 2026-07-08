@@ -10,9 +10,15 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButtonToggleGroup;
@@ -22,9 +28,6 @@ import com.sns.kanta.data.repository.PlayLaterManager;
 import com.sns.kanta.data.repository.RecentSongsManager;
 import com.sns.kanta.helper.SearchHistoryManager;
 import com.sns.kanta.model.VideoModel;
-
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -40,10 +43,13 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
+        super.onCreate(savedInstanceState);
         prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
 
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        setupWindowInsets();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -60,6 +66,41 @@ public class ProfileActivity extends AppCompatActivity {
         setupButtons();
 
         ((TextView) findViewById(R.id.tvVersionInfo)).setText(getString(R.string.profile_version_info, getString(R.string.app_name), BuildConfig.VERSION_NAME));
+    }
+
+    private void setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.coordinatorLayout), (v, windowInsets) -> {
+            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
+            
+            int topInset = Math.max(systemBars.top, displayCutout.top);
+            
+            android.view.View appBarLayout = findViewById(R.id.appBarLayout);
+            if (appBarLayout != null) {
+                appBarLayout.setPadding(
+                    appBarLayout.getPaddingLeft(),
+                    topInset,
+                    appBarLayout.getPaddingRight(),
+                    appBarLayout.getPaddingBottom()
+                );
+            }
+            
+            android.view.View scrollView = findViewById(R.id.nestedScrollView);
+            if (scrollView != null) {
+                int baseBottomPadding = (int) (32 * getResources().getDisplayMetrics().density);
+                scrollView.setPadding(
+                    scrollView.getPaddingLeft(),
+                    scrollView.getPaddingTop(),
+                    scrollView.getPaddingRight(),
+                    baseBottomPadding + systemBars.bottom
+                );
+            }
+            
+            // Side insets for landscape
+            v.setPadding(systemBars.left, 0, systemBars.right, 0);
+            
+            return WindowInsetsCompat.CONSUMED;
+        });
     }
 
     @Override

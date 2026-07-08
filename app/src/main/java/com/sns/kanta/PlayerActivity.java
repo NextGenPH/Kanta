@@ -147,8 +147,8 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        super.onCreate(savedInstanceState);
 
         GlobalPlayerManager.getInstance().setMinimized(false);
 
@@ -184,20 +184,41 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
             androidx.core.graphics.Insets systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
             androidx.core.graphics.Insets displayCutout = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.displayCutout());
 
-            // Handle safe area for landscape (notches on sides)
+            // Determine safe areas
             int leftSafe = Math.max(systemBars.left, displayCutout.left);
             int rightSafe = Math.max(systemBars.right, displayCutout.right);
+            int topSafe = Math.max(systemBars.top, displayCutout.top);
+            int bottomSafe = systemBars.bottom;
 
+            // Padding for the overlay controls
             if (binding.controlsOverlay != null) {
                 binding.controlsOverlay.setPadding(leftSafe, 0, rightSafe, 0);
             }
 
             // Apply top padding to info bar for status bar / notch area
             if (binding.topInfoBar != null) {
-                binding.topInfoBar.setPadding(binding.topInfoBar.getPaddingLeft(), systemBars.top, binding.topInfoBar.getPaddingRight(), binding.topInfoBar.getPaddingBottom());
+                binding.topInfoBar.setPadding(
+                    binding.topInfoBar.getPaddingLeft(), 
+                    topSafe, 
+                    binding.topInfoBar.getPaddingRight(), 
+                    binding.topInfoBar.getPaddingBottom()
+                );
             }
 
-            return insets;
+            // Apply side padding to root for landscape notches
+            binding.getRoot().setPadding(leftSafe, 0, rightSafe, 0);
+
+            // Apply bottom padding to nestedScrollView for navigation bar
+            if (binding.nestedScrollView != null) {
+                binding.nestedScrollView.setPadding(
+                    binding.nestedScrollView.getPaddingLeft(),
+                    binding.nestedScrollView.getPaddingTop(),
+                    binding.nestedScrollView.getPaddingRight(),
+                    bottomSafe
+                );
+            }
+
+            return androidx.core.view.WindowInsetsCompat.CONSUMED;
         });
     }
 

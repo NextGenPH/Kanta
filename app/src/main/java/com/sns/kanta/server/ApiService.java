@@ -81,7 +81,9 @@ public interface ApiService {
             @Query("select") String select
     );
 
-    /** Paginated version — used for the "Popular" chip to order by play_count across all time. */
+    /**
+     * Paginated version — used for the "Popular" chip to order by play_count across all time.
+     */
     @Headers("Prefer: count=exact")
     @GET("rest/v1/trending_songs")
     Call<List<VideoModel>> getTrendingSongsPaged(

@@ -49,6 +49,20 @@ public final class DonateDialogFragment extends DialogFragment {
             }
         });
 
+        // Apply window insets to webView to avoid status/nav bars and notches
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
+            androidx.core.graphics.Insets systemBars = windowInsets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
+            androidx.core.graphics.Insets cutout = windowInsets.getInsets(androidx.core.view.WindowInsetsCompat.Type.displayCutout());
+            
+            v.setPadding(
+                Math.max(systemBars.left, cutout.left),
+                Math.max(systemBars.top, cutout.top),
+                Math.max(systemBars.right, cutout.right),
+                Math.max(systemBars.bottom, cutout.bottom)
+            );
+            return windowInsets;
+        });
+
         // Load the donation target URL
         webView.loadUrl("https://www.nextgenph.site/donatepage/index.html");
 

@@ -9,12 +9,12 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.sns.kanta.data.local.dao.PlayLaterDao;
 import com.sns.kanta.data.local.dao.RecentSongsDao;
 import com.sns.kanta.data.local.dao.SearchHistoryDao;
-import com.sns.kanta.data.local.dao.PlayLaterDao;
+import com.sns.kanta.data.local.entity.PlayLaterEntity;
 import com.sns.kanta.data.local.entity.RecentSongEntity;
 import com.sns.kanta.data.local.entity.SearchHistoryEntity;
-import com.sns.kanta.data.local.entity.PlayLaterEntity;
 
 @Database(
         entities = {SearchHistoryEntity.class, RecentSongEntity.class, PlayLaterEntity.class},

@@ -329,8 +329,8 @@
                             <ImageView
                                 android:layout_width="16dp"
                                 android:layout_height="16dp"
-                                android:src="@drawable/ic_play_count"
                                 android:contentDescription="@null"
+                                android:src="@drawable/ic_play_count"
                                 app:tint="@color/text_secondary" />
 
                             <TextView
@@ -347,8 +347,8 @@
                                 android:layout_width="16dp"
                                 android:layout_height="16dp"
                                 android:layout_marginStart="16dp"
-                                android:src="@drawable/ic_calendar"
                                 android:contentDescription="@null"
+                                android:src="@drawable/ic_calendar"
                                 app:tint="@color/text_secondary" />
 
                             <TextView

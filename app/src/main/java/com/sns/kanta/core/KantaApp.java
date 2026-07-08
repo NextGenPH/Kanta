@@ -32,7 +32,7 @@ public class KantaApp extends Application {
 
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
             // Guard against third-party NextGenUpdater background thread Toast crash on network failure
-            if (throwable instanceof NullPointerException && throwable.getMessage() != null 
+            if (throwable instanceof NullPointerException && throwable.getMessage() != null
                     && throwable.getMessage().contains("Looper.prepare()")) {
                 for (StackTraceElement element : throwable.getStackTrace()) {
                     if (element.getClassName().contains("com.nextgen.updater")) {

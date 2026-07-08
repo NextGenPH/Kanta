@@ -3,7 +3,6 @@ package com.sns.kanta.helper;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
@@ -18,7 +17,8 @@ import java.lang.reflect.Method;
 
 public final class MenuUtils {
 
-    private MenuUtils() {}
+    private MenuUtils() {
+    }
 
     /**
      * Shows a Material Design 3 style popup menu for a media item.

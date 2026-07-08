@@ -13,6 +13,10 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -57,12 +61,15 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         binding = ActivitySearchBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         historyManager = SearchHistoryManager.getInstance(this);
+
+        setupWindowInsets();
 
         setupUI();
         observeViewModel();
@@ -84,6 +91,48 @@ public class SearchActivity extends AppCompatActivity {
                     imm.showSoftInput(binding.searchInput, InputMethodManager.SHOW_IMPLICIT);
             }, 200);
         }
+    }
+
+    private void setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
+            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
+            
+            int topInset = Math.max(systemBars.top, displayCutout.top);
+            
+            binding.appBarLayout.setPadding(
+                binding.appBarLayout.getPaddingLeft(),
+                topInset,
+                binding.appBarLayout.getPaddingRight(),
+                binding.appBarLayout.getPaddingBottom()
+            );
+            
+            // Apply bottom padding to all scrollable results
+            int bottomSafe = systemBars.bottom;
+            binding.recyclerHistory.setPadding(
+                binding.recyclerHistory.getPaddingLeft(),
+                binding.recyclerHistory.getPaddingTop(),
+                binding.recyclerHistory.getPaddingRight(),
+                bottomSafe
+            );
+            binding.recyclerTrending.setPadding(
+                binding.recyclerTrending.getPaddingLeft(),
+                binding.recyclerTrending.getPaddingTop(),
+                binding.recyclerTrending.getPaddingRight(),
+                bottomSafe
+            );
+            binding.recyclerResults.setPadding(
+                binding.recyclerResults.getPaddingLeft(),
+                binding.recyclerResults.getPaddingTop(),
+                binding.recyclerResults.getPaddingRight(),
+                bottomSafe
+            );
+            
+            // Side insets for landscape
+            binding.coordinatorLayout.setPadding(systemBars.left, 0, systemBars.right, 0);
+            
+            return WindowInsetsCompat.CONSUMED;
+        });
     }
 
     private void setupUI() {

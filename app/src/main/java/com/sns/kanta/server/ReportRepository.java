@@ -69,6 +69,7 @@ public final class ReportRepository {
 
     public interface SubmitCallback {
         void onSuccess();
+
         void onFailure(@NonNull Throwable t);
     }
 }

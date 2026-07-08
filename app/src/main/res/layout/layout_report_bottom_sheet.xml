@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/bg_surface"
     android:orientation="vertical"
-    android:paddingBottom="24dp"
-    android:paddingHorizontal="16dp">
+    android:paddingHorizontal="16dp"
+    android:paddingBottom="24dp">
 
     <!-- MD3 Drag Handle -->
     <ImageView
@@ -214,8 +213,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Next"
-            android:enabled="false" />
+            android:enabled="false"
+            android:text="Next" />
 
     </LinearLayout>
 
