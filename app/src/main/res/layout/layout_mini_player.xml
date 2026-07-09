@@ -25,6 +25,7 @@
             android:id="@+id/miniThumbnail"
             android:layout_width="60dp"
             android:layout_height="42dp"
+            android:contentDescription="@null"
             android:scaleType="centerCrop"
             app:shapeAppearanceOverlay="@style/ShapeAppearance.Kanta.ThumbnailSmall"
             tools:src="@drawable/ic_thumbnail_placeholder" />
@@ -61,25 +62,24 @@
 
         </LinearLayout>
 
-        <!-- Play / Pause -->
         <ImageButton
             android:id="@+id/btnMiniPlayPause"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/cd_play_pause"
-            android:padding="10dp"
+            android:padding="12dp"
             android:src="@drawable/ic_play"
             app:tint="@color/text_primary" />
 
         <!-- Close -->
         <ImageButton
             android:id="@+id/btnMiniClose"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/btn_close"
-            android:padding="12dp"
+            android:padding="14dp"
             android:src="@drawable/ic_close"
             app:tint="@color/text_secondary" />
 

@@ -13,18 +13,48 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/bg_surface"
-        app:elevation="0dp">
+        app:elevation="0dp"
+        app:liftOnScroll="true">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            app:navigationIconTint="@color/text_primary"
-            app:title="@string/profile_title"
-            app:titleCentered="false"
-            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
-            app:titleTextColor="@color/text_primary" />
+            app:contentInsetStart="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="4dp">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/btn_back"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/text_primary" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/profile_title"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -33,8 +63,8 @@
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:overScrollMode="never"
         android:clipToPadding="false"
+        android:overScrollMode="never"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -45,7 +75,7 @@
             android:paddingTop="16dp"
             android:paddingBottom="32dp">
 
-            <!-- ── Profile Header (Google & YouTube Inspired) ── -->
+            <!-- ── Profile Header ── -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -53,26 +83,18 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <!-- Avatar Circle -->
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:layout_width="84dp"
+                    android:layout_height="84dp"
+                    android:background="@color/bg_surface2"
+                    android:contentDescription="@null"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_profile"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Kanta.Circular"
+                    app:strokeColor="@color/divider"
+                    app:strokeWidth="1dp"
+                    app:tint="@color/text_primary" />
 
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/ivProfileAvatar"
-                        android:layout_width="84dp"
-                        android:layout_height="84dp"
-                        android:background="@color/bg_surface2"
-                        android:padding="16dp"
-                        android:src="@drawable/ic_profile"
-                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Kanta.Circular"
-                        app:strokeColor="@color/divider"
-                        app:strokeWidth="1dp"
-                        app:tint="@color/text_primary" />
-
-                </FrameLayout>
-
-                <!-- Name & Edit -->
                 <LinearLayout
                     android:id="@+id/layoutEditName"
                     android:layout_width="wrap_content"
@@ -109,7 +131,6 @@
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/tvProfileTagline"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -119,15 +140,13 @@
 
             </LinearLayout>
 
-            <!-- ── Play Later Section (YouTube Watch Later style Card) ── -->
+            <!-- Play Later Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="28dp"
-                android:orientation="vertical"
-                android:paddingHorizontal="4dp">
+                android:orientation="vertical">
 
-                <!-- Playlist Header (YouTube Style) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -138,6 +157,7 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_queue_music"
                         app:tint="?attr/colorPrimary" />
 
@@ -146,12 +166,11 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="Play Later"
+                        android:text="@string/profile_play_later"
                         android:textColor="@color/text_primary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
-                    <!-- Item Count Badge -->
                     <TextView
                         android:id="@+id/tvPlayLaterCount"
                         android:layout_width="wrap_content"
@@ -163,10 +182,8 @@
                         android:textSize="11sp"
                         android:textStyle="bold"
                         tools:text="12 songs" />
-
                 </LinearLayout>
 
-                <!-- Empty State Container -->
                 <LinearLayout
                     android:id="@+id/layoutPlayLaterEmpty"
                     android:layout_width="match_parent"
@@ -174,12 +191,12 @@
                     android:gravity="center"
                     android:orientation="vertical"
                     android:paddingVertical="24dp"
-                    android:visibility="gone"
-                    tools:visibility="visible">
+                    android:visibility="gone">
 
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_queue_music"
                         app:tint="@color/text_secondary" />
 
@@ -187,34 +204,20 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="Nothing saved yet"
+                        android:text="@string/profile_play_later_empty"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:gravity="center"
-                        android:text="Songs you save for later will appear here."
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-
                 </LinearLayout>
 
-                <!-- Saved Items RecyclerView -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvPlayLater"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:overScrollMode="never"
-                    android:scrollbars="none"
-                    android:visibility="visible" />
-
+                    android:overScrollMode="never" />
             </LinearLayout>
 
-            <!-- ── Theme Selection ── -->
+            <!-- Theme Selection -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -225,7 +228,6 @@
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
-            <!-- Segmented Control Style Toggle Group -->
             <com.google.android.material.button.MaterialButtonToggleGroup
                 android:id="@+id/themeToggleGroup"
                 android:layout_width="match_parent"
@@ -274,32 +276,17 @@
                     android:textColor="@color/text_primary"
                     android:textSize="12sp"
                     app:cornerRadius="8dp" />
-
             </com.google.android.material.button.MaterialButtonToggleGroup>
 
-            <!-- ── Data Management Section ── -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/profile_data_management"
-                android:textColor="@color/text_primary"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <!-- ── Data Management Cards ── -->
+            <!-- Actions -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnClearHistory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:clickable="true"
-                android:focusable="true"
                 app:cardBackgroundColor="@color/bg_surface"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:rippleColor="?attr/colorControlHighlight"
                 app:strokeColor="@color/divider"
                 app:strokeWidth="1dp">
 
@@ -313,6 +300,7 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_delete"
                         app:tint="@color/text_primary" />
 
@@ -335,18 +323,17 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Delete all recent search queries from this device."
+                            android:text="@string/profile_clear_history_msg"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
-
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
                         app:tint="@color/text_secondary" />
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -355,12 +342,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="28dp"
-                android:clickable="true"
-                android:focusable="true"
                 app:cardBackgroundColor="@color/bg_surface"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:rippleColor="?attr/colorControlHighlight"
                 app:strokeColor="@color/divider"
                 app:strokeWidth="1dp">
 
@@ -374,6 +358,7 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_delete"
                         app:tint="@color/text_primary" />
 
@@ -396,44 +381,29 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Free up storage space by clearing cached thumbnails."
+                            android:text="@string/profile_clear_cache_msg"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
-
                     </LinearLayout>
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
                         app:tint="@color/text_secondary" />
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ── Options & About Section ── -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginBottom="8dp"
-                android:text="Support &amp; About"
-                android:textColor="@color/text_primary"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <!-- ── Support & About Cards ── -->
+            <!-- Support Sections -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnShareApp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:clickable="true"
-                android:focusable="true"
                 app:cardBackgroundColor="@color/bg_surface"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:rippleColor="?attr/colorControlHighlight"
                 app:strokeColor="@color/divider"
                 app:strokeWidth="1dp">
 
@@ -447,40 +417,26 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_share"
                         app:tint="@color/text_primary" />
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/profile_share_app"
-                            android:textColor="@color/text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Spread the word and share the app with your friends."
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
+                        android:text="@string/profile_share_app"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
                         app:tint="@color/text_secondary" />
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -489,12 +445,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:clickable="true"
-                android:focusable="true"
                 app:cardBackgroundColor="@color/bg_surface"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:rippleColor="?attr/colorControlHighlight"
                 app:strokeColor="@color/divider"
                 app:strokeWidth="1dp">
 
@@ -508,40 +461,26 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_help"
                         app:tint="@color/text_primary" />
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/help_title"
-                            android:textColor="@color/text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Get support or send us your suggestions."
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
+                        android:text="@string/help_title"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
                         app:tint="@color/text_secondary" />
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -550,12 +489,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:clickable="true"
-                android:focusable="true"
                 app:cardBackgroundColor="@color/bg_surface"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:rippleColor="?attr/colorControlHighlight"
                 app:strokeColor="@color/divider"
                 app:strokeWidth="1dp">
 
@@ -569,40 +505,26 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/ic_check"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_lock"
                         app:tint="@color/text_primary" />
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/profile_policy"
-                            android:textColor="@color/text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Read how we protect your personal information."
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
+                        android:text="@string/profile_policy"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
                         app:tint="@color/text_secondary" />
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -610,13 +532,10 @@
                 android:id="@+id/btnShowDisclaimer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:clickable="true"
-                android:focusable="true"
+                android:layout_marginBottom="12dp"
                 app:cardBackgroundColor="@color/bg_surface"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:rippleColor="?attr/colorControlHighlight"
                 app:strokeColor="@color/divider"
                 app:strokeWidth="1dp">
 
@@ -630,55 +549,37 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_help"
                         app:tint="@color/text_primary" />
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/profile_disclaimer"
-                            android:textColor="@color/text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Important notices regarding application usage."
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
+                        android:text="@string/profile_disclaimer"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
                         app:tint="@color/text_secondary" />
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ── Donate Section (Material Card) ── -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardDonate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="28dp"
-                android:clickable="true"
-                android:focusable="true"
                 app:cardBackgroundColor="@color/bg_surface"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:rippleColor="?attr/colorControlHighlight"
                 app:strokeColor="@color/divider"
                 app:strokeWidth="1dp">
 
@@ -692,54 +593,37 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_heart"
                         app:tint="@color/text_primary" />
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Donate"
-                            android:textColor="@color/text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Support the project and help keep our servers running."
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
+                        android:text="@string/menu_donate"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
                         app:tint="@color/text_secondary" />
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ── Version Footer ── -->
             <TextView
                 android:id="@+id/tvVersionInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:text="Kanta Version 1.8"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
-                tools:ignore="SmallSp" />
+                tools:text="Kanta Version 1.8" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

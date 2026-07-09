@@ -6,22 +6,12 @@
     android:background="@color/bg_primary">
 
     <!-- Centered Logo Layout -->
-    <LinearLayout
-        android:id="@+id/logoContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:layout_width="96dp"
+        android:layout_height="96dp"
         android:layout_centerInParent="true"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/ivLogo"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:contentDescription="@string/app_name"
-            android:src="@drawable/app_ic" />
-
-    </LinearLayout>
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/app_ic" />
 
     <!-- Circular Progress Indicator at bottom center (Material 3 style) -->
     <com.google.android.material.progressindicator.CircularProgressIndicator

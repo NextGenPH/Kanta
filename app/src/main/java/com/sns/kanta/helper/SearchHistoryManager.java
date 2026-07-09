@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sns.kanta.BuildConfig;
 import com.sns.kanta.data.local.dao.SearchHistoryDao;
 import com.sns.kanta.data.local.db.KantaDatabase;
 import com.sns.kanta.data.local.entity.SearchHistoryEntity;
@@ -121,7 +122,9 @@ public final class SearchHistoryManager {
     }
 
     public void clearHistory() {
-        Log.d(TAG, "Clearing all search history");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "Clearing all search history");
+        }
         synchronized (historyCache) {
             historyCache.clear();
         }
@@ -129,7 +132,9 @@ public final class SearchHistoryManager {
 
         executor.execute(() -> {
             historyDao.clearHistory();
-            Log.d(TAG, "History cleared from database");
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "History cleared from database");
+            }
         });
     }
 

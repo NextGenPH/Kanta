@@ -6,15 +6,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -58,6 +59,21 @@ public class OnboardingActivity extends AppCompatActivity {
 
         OnboardingAdapter adapter = new OnboardingAdapter(items);
         binding.viewPager.setAdapter(adapter);
+        binding.viewPager.setOffscreenPageLimit(1);
+
+        // Custom Page Transformer for smooth transitions
+        binding.viewPager.setPageTransformer((page, position) -> {
+            float absPos = Math.abs(position);
+            page.setAlpha(1 - absPos);
+
+            View iv = page.findViewById(R.id.ivOnboarding);
+            View title = page.findViewById(R.id.tvTitle);
+            View desc = page.findViewById(R.id.tvDescription);
+
+            if (iv != null) iv.setTranslationX(position * -200);
+            if (title != null) title.setTranslationX(position * 300);
+            if (desc != null) desc.setTranslationX(position * 500);
+        });
 
         new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
         }).attach();
@@ -67,10 +83,14 @@ public class OnboardingActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 if (position == items.size() - 1) {
                     binding.btnNext.setText(R.string.btn_get_started);
-                    binding.btnSkip.setVisibility(View.GONE);
+                    binding.btnSkip.animate().alpha(0f).setDuration(200).withEndAction(() -> binding.btnSkip.setVisibility(View.GONE)).start();
                 } else {
                     binding.btnNext.setText(R.string.btn_next);
-                    binding.btnSkip.setVisibility(View.VISIBLE);
+                    if (binding.btnSkip.getVisibility() != View.VISIBLE) {
+                        binding.btnSkip.setVisibility(View.VISIBLE);
+                        binding.btnSkip.setAlpha(0f);
+                        binding.btnSkip.animate().alpha(1f).setDuration(200).start();
+                    }
                 }
             }
         });
@@ -93,27 +113,29 @@ public class OnboardingActivity extends AppCompatActivity {
 
             int topSafe = Math.max(systemBars.top, displayCutout.top);
             int bottomSafe = systemBars.bottom;
-            
+            int leftSafe = systemBars.left;
+            int rightSafe = systemBars.right;
+
+            binding.coordinatorLayout.setPadding(leftSafe, 0, rightSafe, 0);
+
+            // Adjust Skip button for status bar
             ViewGroup.MarginLayoutParams skipLp = (ViewGroup.MarginLayoutParams) binding.btnSkip.getLayoutParams();
-            int baseSkipMargin = (int) (16 * getResources().getDisplayMetrics().density);
-            skipLp.topMargin = baseSkipMargin + topSafe;
+            skipLp.topMargin = (int) (16 * getResources().getDisplayMetrics().density) + topSafe;
             binding.btnSkip.setLayoutParams(skipLp);
-            
-            ViewGroup.MarginLayoutParams nextLp = (ViewGroup.MarginLayoutParams) binding.btnNext.getLayoutParams();
-            int baseNextMargin = (int) (24 * getResources().getDisplayMetrics().density);
-            nextLp.bottomMargin = baseNextMargin + bottomSafe;
-            binding.btnNext.setLayoutParams(nextLp);
-            
-            // Side insets for landscape
-            binding.getRoot().setPadding(systemBars.left, 0, systemBars.right, 0);
+
+            // Adjust Bottom Controls for nav bar
+            android.view.View bottomControls = findViewById(R.id.bottomControls);
+            if (bottomControls != null) {
+                bottomControls.setPadding(
+                        bottomControls.getPaddingLeft(),
+                        bottomControls.getPaddingTop(),
+                        bottomControls.getPaddingRight(),
+                        bottomSafe
+                );
+            }
 
             return WindowInsetsCompat.CONSUMED;
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     private void completeOnboarding() {
@@ -156,6 +178,18 @@ public class OnboardingActivity extends AppCompatActivity {
             holder.ivImage.setImageResource(item.imageRes);
             holder.tvTitle.setText(item.title);
             holder.tvDescription.setText(item.description);
+
+            // Initial Entrance Animation
+            holder.ivImage.setTranslationY(100f);
+            holder.ivImage.setAlpha(0f);
+            holder.tvTitle.setTranslationY(50f);
+            holder.tvTitle.setAlpha(0f);
+            holder.tvDescription.setTranslationY(30f);
+            holder.tvDescription.setAlpha(0f);
+
+            holder.ivImage.animate().translationY(0f).alpha(1f).setDuration(600).setStartDelay(100).setInterpolator(new AccelerateDecelerateInterpolator()).start();
+            holder.tvTitle.animate().translationY(0f).alpha(1f).setDuration(600).setStartDelay(250).setInterpolator(new AccelerateDecelerateInterpolator()).start();
+            holder.tvDescription.animate().translationY(0f).alpha(1f).setDuration(600).setStartDelay(400).setInterpolator(new AccelerateDecelerateInterpolator()).start();
         }
 
         @Override

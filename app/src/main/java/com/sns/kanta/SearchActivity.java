@@ -14,15 +14,15 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.activity.EdgeToEdge;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -30,7 +30,9 @@ import com.sns.kanta.adapter.SearchHistoryAdapter;
 import com.sns.kanta.adapter.SearchResultAdapter;
 import com.sns.kanta.databinding.ActivitySearchBinding;
 import com.sns.kanta.helper.SearchHistoryManager;
+import com.sns.kanta.model.ReservationModel;
 import com.sns.kanta.model.VideoModel;
+import com.sns.kanta.player.GlobalPlayerManager;
 import com.sns.kanta.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
@@ -72,6 +74,7 @@ public class SearchActivity extends AppCompatActivity {
         setupWindowInsets();
 
         setupUI();
+        setupMiniPlayer();
         observeViewModel();
         historyManager.addListener(historyListener);
 
@@ -97,42 +100,86 @@ public class SearchActivity extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
             Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
-            
-            int topInset = Math.max(systemBars.top, displayCutout.top);
-            
-            binding.appBarLayout.setPadding(
-                binding.appBarLayout.getPaddingLeft(),
-                topInset,
-                binding.appBarLayout.getPaddingRight(),
-                binding.appBarLayout.getPaddingBottom()
-            );
-            
-            // Apply bottom padding to all scrollable results
+
+            // 1. Fixed Top Padding for AppBarLayout
+            int topSafe = Math.max(systemBars.top, displayCutout.top);
+            binding.appBarLayout.setPadding(0, topSafe, 0, 0);
+
+            // 2. Fixed Bottom Padding for system nav bar
+            binding.bottomContainer.setPadding(0, 0, 0, systemBars.bottom);
+
+            // 3. Bottom Padding for scrollable lists
             int bottomSafe = systemBars.bottom;
-            binding.recyclerHistory.setPadding(
-                binding.recyclerHistory.getPaddingLeft(),
-                binding.recyclerHistory.getPaddingTop(),
-                binding.recyclerHistory.getPaddingRight(),
-                bottomSafe
-            );
-            binding.recyclerTrending.setPadding(
-                binding.recyclerTrending.getPaddingLeft(),
-                binding.recyclerTrending.getPaddingTop(),
-                binding.recyclerTrending.getPaddingRight(),
-                bottomSafe
-            );
-            binding.recyclerResults.setPadding(
-                binding.recyclerResults.getPaddingLeft(),
-                binding.recyclerResults.getPaddingTop(),
-                binding.recyclerResults.getPaddingRight(),
-                bottomSafe
-            );
-            
-            // Side insets for landscape
-            binding.coordinatorLayout.setPadding(systemBars.left, 0, systemBars.right, 0);
-            
+            int leftSafe = systemBars.left;
+            int rightSafe = systemBars.right;
+
+            // Add extra padding so content doesn't hide behind mini player (approx 64dp)
+            int miniPlayerHeight = (int) (64 * getResources().getDisplayMetrics().density);
+
+            binding.recyclerHistory.setPadding(leftSafe, 0, rightSafe, bottomSafe + miniPlayerHeight);
+            binding.recyclerTrending.setPadding(leftSafe, 0, rightSafe, bottomSafe + miniPlayerHeight);
+            binding.recyclerResults.setPadding(leftSafe, 0, rightSafe, bottomSafe + miniPlayerHeight);
+
             return WindowInsetsCompat.CONSUMED;
         });
+    }
+
+    private void setupMiniPlayer() {
+        GlobalPlayerManager gpm = GlobalPlayerManager.getInstance();
+        View miniPlayerContainer = findViewById(R.id.miniPlayerView);
+        if (miniPlayerContainer == null) return;
+
+        android.widget.TextView miniTitle = miniPlayerContainer.findViewById(R.id.miniTitle);
+        android.widget.TextView miniArtist = miniPlayerContainer.findViewById(R.id.miniArtist);
+        android.widget.ImageView miniThumbnail = miniPlayerContainer.findViewById(R.id.miniThumbnail);
+        android.widget.ImageButton btnMiniPlayPause = miniPlayerContainer.findViewById(R.id.btnMiniPlayPause);
+        android.widget.ImageButton btnMiniClose = miniPlayerContainer.findViewById(R.id.btnMiniClose);
+        com.google.android.material.progressindicator.LinearProgressIndicator miniProgress = miniPlayerContainer.findViewById(R.id.miniProgress);
+
+        gpm.currentSong.observe(this, song -> {
+            if (song != null) {
+                miniPlayerContainer.setVisibility(View.VISIBLE);
+                if (miniTitle != null) miniTitle.setText(song.getTitle());
+                if (miniArtist != null) miniArtist.setText(song.getArtistSafe());
+                if (miniThumbnail != null) {
+                    com.bumptech.glide.Glide.with(this)
+                            .load(song.getThumbnail())
+                            .placeholder(R.drawable.ic_thumbnail_placeholder)
+                            .into(miniThumbnail);
+                }
+            } else {
+                miniPlayerContainer.setVisibility(View.GONE);
+            }
+        });
+
+        gpm.playerState.observe(this, state -> {
+            if (btnMiniPlayPause != null) {
+                if (state == com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants.PlayerState.PLAYING) {
+                    btnMiniPlayPause.setImageResource(R.drawable.ic_pause);
+                } else {
+                    btnMiniPlayPause.setImageResource(R.drawable.ic_play);
+                }
+            }
+        });
+
+        gpm.currentTime.observe(this, time -> {
+            Float duration = gpm.duration.getValue();
+            if (duration != null && duration > 0 && miniProgress != null) {
+                int progress = (int) ((time / duration) * 1000);
+                miniProgress.setProgressCompat(progress, true);
+            }
+        });
+
+        miniPlayerContainer.setOnClickListener(v -> {
+            ReservationModel song = gpm.currentSong.getValue();
+            if (song != null) {
+                onVideoSelected(new VideoModel(song.getVideoId(), song.getTitle(), song.getChannel(), song.getThumbnail(), song.getArtist()));
+            }
+        });
+
+        if (btnMiniClose != null) btnMiniClose.setOnClickListener(v -> gpm.stop());
+        if (btnMiniPlayPause != null)
+            btnMiniPlayPause.setOnClickListener(v -> miniPlayerContainer.performClick());
     }
 
     private void setupUI() {
@@ -241,14 +288,15 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void onVideoSelected(VideoModel video) {
-        Intent result = new Intent();
-        result.putExtra("video_id", video.getVideoId());
-        result.putExtra("title", video.getTitle());
-        result.putExtra("channel", video.getChannel());
-        result.putExtra("thumbnail", video.getThumbnail());
-        result.putExtra("artist", video.getArtist());
-        setResult(RESULT_OK, result);
-        finish();
+        Intent intent = new Intent(this, PlayerActivity.class);
+        intent.putExtra(MainActivity.EXTRA_VIDEO_ID, video.getVideoId());
+        intent.putExtra(MainActivity.EXTRA_TITLE, video.getTitle());
+        intent.putExtra(MainActivity.EXTRA_CHANNEL, video.getChannel());
+        intent.putExtra("extra_thumbnail", video.getThumbnail());
+        intent.putExtra("extra_artist", video.getArtist());
+
+        android.app.ActivityOptions options = android.app.ActivityOptions.makeCustomAnimation(this, R.anim.slide_up, R.anim.no_animation);
+        startActivity(intent, options.toBundle());
     }
 
     private void observeViewModel() {

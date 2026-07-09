@@ -59,12 +59,6 @@
         <item name="actionMenuTextColor">@color/text_primary</item>
     </style>
 
-    <style name="ToolbarTitleBold" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/text_primary</item>
-    </style>
-
     <!-- ── Alert Dialog ───────────────────────────────────────────────────── -->
 
     <style name="KantaAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
@@ -138,7 +132,12 @@
 
     <style name="ShapeAppearance.Kanta.ThumbnailSmall" parent="ShapeAppearance.Material3.SmallComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/thumbnail_corner_radius</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Kanta.ThumbnailLarge" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">0dp</item>
     </style>
 
     <style name="ShapeAppearance.Kanta.Circular" parent="ShapeAppearance.Material3.Corner.Full">
@@ -149,23 +148,6 @@
     <!-- ── SearchView ─────────────────────────────────────────────────────── -->
 
     <!-- ── MaterialCardView ──────────────────────────────────────────────── -->
-
-    <style name="BottomNavText.Active" parent="TextAppearance.Material3.LabelSmall">
-        <item name="android:textSize">10sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="BottomNavText.Inactive" parent="TextAppearance.Material3.LabelSmall">
-        <item name="android:textSize">10sp</item>
-        <item name="android:textStyle">normal</item>
-    </style>
-
-    <style name="Widget.Kanta.FilterChip" parent="Widget.Material3.Chip.Suggestion">
-        <item name="android:checkable">true</item>
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="chipBackgroundColor">@color/bg_surface2</item>
-        <item name="chipStrokeWidth">0dp</item>
-    </style>
 
     <style name="Theme.Kanta.Player" parent="Theme.Kanta">
         <item name="android:windowTranslucentStatus">false</item>
@@ -181,11 +163,5 @@
     </style>
 
     <!-- Theme overlay for BottomNav and NavigationRail to safely customize M3 active indicator colors -->
-    <style name="ThemeOverlay.Kanta.BottomNav" parent="">
-        <!-- active indicator pill background color (10% opacity primary accent green) -->
-        <item name="colorPrimaryContainer">#1A27AE60</item>
-        <!-- active icon / text color -->
-        <item name="colorOnPrimaryContainer">?attr/colorPrimary</item>
-    </style>
 
 </resources>

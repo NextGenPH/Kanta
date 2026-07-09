@@ -11,12 +11,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,13 +50,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         setupWindowInsets();
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
-        toolbar.setNavigationOnClickListener(v -> finish());
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         setupUserInfo();
         setupPlayLaterSection();
@@ -72,33 +65,27 @@ public class ProfileActivity extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.coordinatorLayout), (v, windowInsets) -> {
             Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
-            
-            int topInset = Math.max(systemBars.top, displayCutout.top);
-            
+
+            // 1. Fixed Top Padding for Toolbar
+            int topSafe = Math.max(systemBars.top, displayCutout.top);
             android.view.View appBarLayout = findViewById(R.id.appBarLayout);
             if (appBarLayout != null) {
-                appBarLayout.setPadding(
-                    appBarLayout.getPaddingLeft(),
-                    topInset,
-                    appBarLayout.getPaddingRight(),
-                    appBarLayout.getPaddingBottom()
-                );
+                appBarLayout.setPadding(0, topSafe, 0, 0);
             }
-            
+
+            // 2. Content safe area for system navigation
             android.view.View scrollView = findViewById(R.id.nestedScrollView);
             if (scrollView != null) {
+                // Side padding for notches in landscape, bottom padding for nav bar
                 int baseBottomPadding = (int) (32 * getResources().getDisplayMetrics().density);
                 scrollView.setPadding(
-                    scrollView.getPaddingLeft(),
-                    scrollView.getPaddingTop(),
-                    scrollView.getPaddingRight(),
-                    baseBottomPadding + systemBars.bottom
+                        systemBars.left,
+                        0,
+                        systemBars.right,
+                        baseBottomPadding + systemBars.bottom
                 );
             }
-            
-            // Side insets for landscape
-            v.setPadding(systemBars.left, 0, systemBars.right, 0);
-            
+
             return WindowInsetsCompat.CONSUMED;
         });
     }
@@ -134,7 +121,7 @@ public class ProfileActivity extends AppCompatActivity {
         input.setLayoutParams(params);
         container.addView(input);
 
-        new MaterialAlertDialogBuilder(this, R.style.KantaAlertDialog)
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.KantaAlertDialog)
                 .setTitle(R.string.profile_edit_name)
                 .setView(container)
                 .setPositiveButton(R.string.btn_ok, (d, w) -> {
@@ -145,7 +132,13 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 })
                 .setNegativeButton(R.string.btn_cancel, null)
-                .show();
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        }
+        dialog.show();
+        input.requestFocus();
     }
 
     private void setupThemeSelection() {
@@ -223,13 +216,25 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void setupButtons() {
         findViewById(R.id.btnShareApp).setOnClickListener(v -> shareApp());
-        findViewById(R.id.btnShowHelp).setOnClickListener(v -> showInfoDialog(R.string.help_title, R.string.help_message));
-        findViewById(R.id.btnShowPolicy).setOnClickListener(v -> showInfoDialog(R.string.policy_title, R.string.policy_content));
-        findViewById(R.id.btnShowDisclaimer).setOnClickListener(v -> showInfoDialog(R.string.disclaimer_title, R.string.disclaimer_content));
-        findViewById(R.id.cardDonate).setOnClickListener(v -> {
-            DonateDialogFragment dialog = new DonateDialogFragment();
-            dialog.show(getSupportFragmentManager(), "DonateDialog");
-        });
+
+        findViewById(R.id.btnShowHelp).setOnClickListener(v ->
+                openWebPage(getString(R.string.menu_quick_guide), "https://www.nextgenph.site/Landingpage/quick-guide.html"));
+
+        findViewById(R.id.btnShowPolicy).setOnClickListener(v ->
+                openWebPage(getString(R.string.profile_policy), "https://www.nextgenph.site/Landingpage/privacy-policy.html"));
+
+        findViewById(R.id.btnShowDisclaimer).setOnClickListener(v ->
+                openWebPage(getString(R.string.profile_disclaimer), "https://www.nextgenph.site/Landingpage/disclaimer.html"));
+
+        findViewById(R.id.cardDonate).setOnClickListener(v ->
+                openWebPage(getString(R.string.menu_donate), "https://www.nextgenph.site/Landingpage/donate.html"));
+    }
+
+    private void openWebPage(String title, String url) {
+        Intent intent = new Intent(this, WebViewActivity.class);
+        intent.putExtra(WebViewActivity.EXTRA_TITLE, title);
+        intent.putExtra(WebViewActivity.EXTRA_URL, url);
+        startActivity(intent);
     }
 
     private void shareApp() {
@@ -239,14 +244,6 @@ public class ProfileActivity extends AppCompatActivity {
         intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
         intent.putExtra(Intent.EXTRA_TEXT, body);
         startActivity(Intent.createChooser(intent, getString(R.string.profile_share_title)));
-    }
-
-    private void showInfoDialog(int titleRes, int contentRes) {
-        new MaterialAlertDialogBuilder(this, R.style.KantaAlertDialog)
-                .setTitle(titleRes)
-                .setMessage(contentRes)
-                .setPositiveButton(R.string.btn_got_it, null)
-                .show();
     }
 
     private void setupPlayLaterSection() {

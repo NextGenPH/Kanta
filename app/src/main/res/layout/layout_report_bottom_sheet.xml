@@ -22,7 +22,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Report"
+        android:text="@string/menu_report"
         android:textColor="@color/text_primary"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="16dp"
-        android:text="Why are you reporting this song?"
+        android:text="@string/report_subtitle"
         android:textColor="@color/text_secondary"
         android:textSize="14sp" />
 
@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_weight="1"
-            android:text="Broken or Not Playing"
+            android:text="@string/report_reason_broken"
             android:textColor="@color/text_primary"
             android:textSize="14sp" />
 
@@ -94,7 +94,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_weight="1"
-            android:text="Poor Audio/Video Quality"
+            android:text="@string/report_reason_quality"
             android:textColor="@color/text_primary"
             android:textSize="14sp" />
 
@@ -129,7 +129,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_weight="1"
-            android:text="Wrong Song or Version"
+            android:text="@string/report_reason_wrong"
             android:textColor="@color/text_primary"
             android:textSize="14sp" />
 
@@ -164,7 +164,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_weight="1"
-            android:text="Other"
+            android:text="@string/report_reason_other"
             android:textColor="@color/text_primary"
             android:textSize="14sp" />
 
@@ -214,7 +214,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:enabled="false"
-            android:text="Next" />
+            android:text="@string/btn_next" />
 
     </LinearLayout>
 

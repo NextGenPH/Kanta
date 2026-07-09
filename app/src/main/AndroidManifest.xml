@@ -85,6 +85,12 @@
             android:theme="@style/Theme.Kanta"
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
+        <activity
+            android:name=".WebViewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Kanta" />
+
     </application>
 
 </manifest>

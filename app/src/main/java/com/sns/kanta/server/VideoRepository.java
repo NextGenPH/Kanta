@@ -1,5 +1,6 @@
 package com.sns.kanta.server;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -10,6 +11,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.sns.kanta.BuildConfig;
+import com.sns.kanta.R;
+import com.sns.kanta.core.KantaApp;
 import com.sns.kanta.core.Resource;
 import com.sns.kanta.model.VideoModel;
 
@@ -106,6 +109,14 @@ public final class VideoRepository {
     }
 
     private String getHumanReadableError(IOException e) {
+        Context context = KantaApp.getInstance();
+        if (context != null) {
+            if (e instanceof UnknownHostException)
+                return context.getString(R.string.error_no_internet);
+            if (e instanceof SocketTimeoutException)
+                return context.getString(R.string.error_timeout);
+            return context.getString(R.string.error_network);
+        }
         if (e instanceof UnknownHostException) return "No Internet Connection";
         if (e instanceof SocketTimeoutException) return "Connection Timeout";
         return "Network Error Occurred";

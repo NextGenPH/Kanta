@@ -57,13 +57,6 @@ public final class RecentSongsManager {
         });
     }
 
-    public void getTotalSongsSung(@NonNull Callback<Integer> callback) {
-        executor.execute(() -> {
-            int count = recentSongsDao.getTotalSongsSung();
-            callback.onResult(count);
-        });
-    }
-
     public void clearHistory() {
         executor.execute(recentSongsDao::clearRecent);
     }

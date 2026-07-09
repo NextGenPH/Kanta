@@ -1,10 +1,8 @@
 package com.sns.kanta;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -60,7 +58,6 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
     private PlaybackManager playbackManager;
     private MainViewModel viewModel;
     private RecentSongsManager recentSongsManager;
-    private AudioManager audioManager;
     private GestureDetector gestureDetector;
     private RelatedSongsAdapter relatedAdapter;
     private FullscreenRelatedAdapter fsRelatedAdapter;
@@ -165,7 +162,6 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
         QueueManager queueManager = QueueManager.getInstance(this);
         recentSongsManager = RecentSongsManager.getInstance(this);
         playbackManager = new PlaybackManager(queueManager, playbackCallback);
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         setupPlayer();
         setupUI();
@@ -184,39 +180,36 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
             androidx.core.graphics.Insets systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
             androidx.core.graphics.Insets displayCutout = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.displayCutout());
 
-            // Determine safe areas
+            // 1. Calculate Safe Zones (for buttons and text)
             int leftSafe = Math.max(systemBars.left, displayCutout.left);
             int rightSafe = Math.max(systemBars.right, displayCutout.right);
             int topSafe = Math.max(systemBars.top, displayCutout.top);
             int bottomSafe = systemBars.bottom;
 
-            // Padding for the overlay controls
+            // 2. Pad the Player Controls Overlay
+            // We pad this so buttons aren't hidden under side notches or the status bar
             if (binding.controlsOverlay != null) {
                 binding.controlsOverlay.setPadding(leftSafe, 0, rightSafe, 0);
             }
 
-            // Apply top padding to info bar for status bar / notch area
+            // 3. Pad the Top Info Bar specifically for the Status Bar
             if (binding.topInfoBar != null) {
-                binding.topInfoBar.setPadding(
-                    binding.topInfoBar.getPaddingLeft(), 
-                    topSafe, 
-                    binding.topInfoBar.getPaddingRight(), 
-                    binding.topInfoBar.getPaddingBottom()
-                );
+                binding.topInfoBar.setPadding(0, topSafe, 0, 0);
             }
 
-            // Apply side padding to root for landscape notches
-            binding.getRoot().setPadding(leftSafe, 0, rightSafe, 0);
-
-            // Apply bottom padding to nestedScrollView for navigation bar
+            // 4. Pad the scrollable description area for the Nav Bar
+            // We allow the content to scroll behind the nav bar, but pad the end
             if (binding.nestedScrollView != null) {
                 binding.nestedScrollView.setPadding(
-                    binding.nestedScrollView.getPaddingLeft(),
-                    binding.nestedScrollView.getPaddingTop(),
-                    binding.nestedScrollView.getPaddingRight(),
-                    bottomSafe
+                        leftSafe, // Match side safe zones for text readability
+                        binding.nestedScrollView.getPaddingTop(),
+                        rightSafe,
+                        bottomSafe
                 );
             }
+
+            // IMPORTANT: We do NOT pad the root or the playerWrapper.
+            // This ensures the video and ambient glow fill the entire screen (Standard Immersive).
 
             return androidx.core.view.WindowInsetsCompat.CONSUMED;
         });
@@ -332,27 +325,11 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
 
             @Override
             public boolean onScroll(@Nullable MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
-                if (isControlsLocked || e1 == null) return false;
-                float deltaY = e1.getY() - e2.getY();
-                if (Math.abs(distanceY) > Math.abs(distanceX)) {
-                    if (e1.getX() < binding.controlsOverlay.getWidth() / 2f) {
-                        adjustBrightness(deltaY / binding.controlsOverlay.getHeight());
-                    } else {
-                        adjustVolume(deltaY / binding.controlsOverlay.getHeight());
-                    }
-                    return true;
-                }
                 return false;
             }
         });
 
-        binding.controlsOverlay.setOnTouchListener((v, ev) -> {
-            boolean handled = gestureDetector.onTouchEvent(ev);
-            if (ev.getAction() == MotionEvent.ACTION_UP) {
-                hideGestureIndicator();
-            }
-            return handled;
-        });
+        binding.controlsOverlay.setOnTouchListener((v, ev) -> gestureDetector.onTouchEvent(ev));
 
         binding.btnOverlayPlayPause.setOnClickListener(v -> {
             if (playbackManager.isReady()) {
@@ -614,7 +591,7 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
         if (related != null && !related.isEmpty()) {
             loadSongFromVideo(related.get(0));
         } else {
-            Toast.makeText(this, "No more related songs to play.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.player_no_more_related), Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -633,7 +610,7 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
             playbackManager.setEndingSoonAlertShown(true);
             List<VideoModel> related = viewModel.relatedSongs.getValue();
             if (related != null && !related.isEmpty()) {
-                Toast.makeText(this, "Up next: " + TextFormatter.formatSongTitle(related.get(0).getTitle()), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.player_up_next_format, TextFormatter.formatSongTitle(related.get(0).getTitle())), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -646,36 +623,6 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
         binding.loadingIndicator.setVisibility(View.GONE);
     }
 
-    private void adjustVolume(float percent) {
-        int max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        int current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        // Multiplier 1.2 for slightly faster adjustment on short swipes
-        int delta = Math.round(percent * max * 1.2f);
-        int next = Math.max(0, Math.min(max, current + delta));
-
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, next, 0);
-        showGestureIndicator(R.drawable.ic_volume_up, (int) ((next / (float) max) * 100) + "%");
-    }
-
-    private void adjustBrightness(float percent) {
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
-        float current = lp.screenBrightness < 0 ? 0.5f : lp.screenBrightness;
-        lp.screenBrightness = Math.max(0.01f, Math.min(1f, current + (percent * 1.2f)));
-        getWindow().setAttributes(lp);
-        showGestureIndicator(R.drawable.ic_brightness, (int) (lp.screenBrightness * 100) + "%");
-    }
-
-    private void showGestureIndicator(int icon, String text) {
-        binding.layoutGestureIndicator.setVisibility(View.VISIBLE);
-        binding.layoutGestureIndicator.setAlpha(1f);
-        binding.ivGestureIcon.setImageResource(icon);
-        binding.tvGestureValue.setText(text);
-    }
-
-    private void hideGestureIndicator() {
-        binding.layoutGestureIndicator.animate().alpha(0f).setDuration(300).withEndAction(() -> binding.layoutGestureIndicator.setVisibility(View.GONE)).start();
-    }
-
     private void showSeekFeedback(View v) {
         v.setAlpha(1f);
         v.animate().alpha(0f).setDuration(600).setStartDelay(200).start();
@@ -684,10 +631,10 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
     private void updateLockState() {
         if (isControlsLocked) {
             hideControls();
-            Toast.makeText(this, "Controls Locked", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.player_controls_locked), Toast.LENGTH_SHORT).show();
         } else {
             showControls();
-            Toast.makeText(this, "Controls Unlocked", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.player_controls_unlocked), Toast.LENGTH_SHORT).show();
         }
     }
 

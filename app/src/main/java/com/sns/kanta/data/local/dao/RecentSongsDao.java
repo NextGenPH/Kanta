@@ -21,6 +21,5 @@ public interface RecentSongsDao {
     @Query("DELETE FROM recent_songs")
     void clearRecent();
 
-    @Query("SELECT COUNT(*) FROM recent_songs")
-    int getTotalSongsSung();
+
 }

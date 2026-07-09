@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Simple Gradient Background -->
+    <!-- Material 3 Surface Background -->
     <item>
         <shape android:shape="rectangle">
-            <gradient
-                android:angle="135"
-                android:endColor="@color/bg_surface2"
-                android:startColor="@color/bg_surface" />
-            <corners android:radius="8dp" />
+            <solid android:color="@color/bg_surface2" />
         </shape>
     </item>
 
-    <!-- Music Note Icon -->
+    <!-- Subtle Centered Icon -->
     <item
-        android:width="24dp"
-        android:height="24dp"
-        android:drawable="@drawable/ic_queue_music"
-        android:gravity="center" />
+        android:width="32dp"
+        android:height="32dp"
+        android:gravity="center">
+        <vector
+            android:width="24dp"
+            android:height="24dp"
+            android:tint="@color/divider"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
+            <path
+                android:fillColor="@android:color/white"
+                android:pathData="M12,3v10.55c-0.59,-0.34 -1.27,-0.55 -2,-0.55 -2.21,0 -4,1.79 -4,4s1.79,4 4,4 4,-1.79 4,-4V7h4V3H12z" />
+        </vector>
+    </item>
 
 </layer-list>

@@ -17,11 +17,9 @@
         app:liftOnScroll="true">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:contentInsetStart="0dp"
-            app:layout_scrollFlags="scroll|enterAlways|snap">
+            app:contentInsetStart="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -42,7 +40,7 @@
                     <ImageView
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:contentDescription="@string/app_name"
+                        android:contentDescription="@null"
                         android:scaleType="centerInside"
                         android:src="@drawable/app_ic" />
 
@@ -99,8 +97,7 @@
             android:layout_height="wrap_content"
             android:background="@color/bg_surface"
             android:fillViewport="false"
-            android:scrollbars="none"
-            app:layout_scrollFlags="scroll|enterAlways">
+            android:scrollbars="none">
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/filterChipGroup"
@@ -122,203 +119,174 @@
                     android:text="@string/chip_trending" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipNewReleases"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_new_releases" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipPopular"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_popular" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipBrunoMars"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_bruno_mars" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipTaylorSwift"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_taylor_swift" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipEdSheeran"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_ed_sheeran" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipAdele"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_adele" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipBINI"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_bini" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipSB19"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_sb19" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipBenBen"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_benben" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipMoira"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_moira" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipArthurNery"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_arthur_nery" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipZackTabudlo"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_zack_tabudlo" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipTJMonterde"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_tj_monterde" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipDecemberAvenue"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_december_avenue" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipCupOfJoe"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_cup_of_joe" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipParokya"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_parokya" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipEraserheads"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_eraserheads" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipRivermaya"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_rivermaya" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipSilentSanctuary"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_silent_sanctuary" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipRegine"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_regine" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipSarah"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_sarah" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipYeng"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_yeng" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipGloc9"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_gloc9" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipTheWeeknd"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_the_weeknd" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipOliviaRodrigo"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_olivia_rodrigo" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipBillieEilish"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_billie_eilish" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipColdplay"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_coldplay" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipMaroon5"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_maroon5" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipImagineDragons"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -352,7 +320,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingBottom="76dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_video_feed" />
 
@@ -439,12 +406,13 @@
         </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <!-- ─────────────────── Bottom Bar ─────────────────── -->
+    <!-- ─────────────────── Bottom Bar (Mini Player only) ─────────────────── -->
     <LinearLayout
         android:id="@+id/bottomContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:background="@color/bg_surface"
         android:elevation="8dp"
         android:orientation="vertical">
 

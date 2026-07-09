@@ -2,17 +2,17 @@ package com.sns.kanta;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import android.view.ViewGroup;
-import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -72,32 +72,21 @@ public class RemoteActivity extends AppCompatActivity
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
             Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
-            
-            int topInset = Math.max(systemBars.top, displayCutout.top);
-            
-            binding.mainContentLayout.setPadding(
-                binding.mainContentLayout.getPaddingLeft(),
-                topInset,
-                binding.mainContentLayout.getPaddingRight(),
-                binding.mainContentLayout.getPaddingBottom()
-            );
-            
+
+            // 1. Fixed Top Padding
+            int topSafe = Math.max(systemBars.top, displayCutout.top);
+            binding.mainContentLayout.setPadding(systemBars.left, topSafe, systemBars.right, 0);
+
+            // 2. Clear Navigation Bar for bottom controls
             ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) binding.floatingControlsLayout.getLayoutParams();
             int baseMargin = (int) (16 * getResources().getDisplayMetrics().density);
             lp.bottomMargin = baseMargin + systemBars.bottom;
             binding.floatingControlsLayout.setLayoutParams(lp);
-            
+
+            // 3. Clear Navigation Bar for scrolled content
             int baseScrollPadding = (int) (100 * getResources().getDisplayMetrics().density);
-            binding.nestedScrollView.setPadding(
-                binding.nestedScrollView.getPaddingLeft(),
-                binding.nestedScrollView.getPaddingTop(),
-                binding.nestedScrollView.getPaddingRight(),
-                baseScrollPadding + systemBars.bottom
-            );
-            
-            // Side insets for landscape
-            binding.coordinatorLayout.setPadding(systemBars.left, 0, systemBars.right, 0);
-            
+            binding.nestedScrollView.setPadding(0, 0, 0, baseScrollPadding + systemBars.bottom);
+
             return WindowInsetsCompat.CONSUMED;
         });
     }
@@ -119,12 +108,12 @@ public class RemoteActivity extends AppCompatActivity
 
         binding.btnRemoteMute.setOnClickListener(v -> {
             remoteManager.sendRemoteCommand("command", "toggle_mute");
-            Toast.makeText(this, "Toggled Mute on TV", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.remote_toggled_mute), Toast.LENGTH_SHORT).show();
         });
 
         binding.btnRemoteFullscreen.setOnClickListener(v -> {
             remoteManager.sendRemoteCommand("command", "toggle_fullscreen");
-            Toast.makeText(this, "Requesting Fullscreen on TV...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.remote_requesting_fullscreen), Toast.LENGTH_SHORT).show();
         });
 
         binding.btnRemoteToggleQueue.setOnClickListener(v -> {
@@ -133,13 +122,13 @@ public class RemoteActivity extends AppCompatActivity
 
         binding.btnRemoteClearQueue.setOnClickListener(v -> {
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.KantaAlertDialog)
-                    .setTitle("Clear TV Queue?")
-                    .setMessage("This will remove all upcoming songs on the TV.")
-                    .setPositiveButton("Clear", (d, w) -> {
+                    .setTitle(R.string.remote_clear_queue_title)
+                    .setMessage(R.string.remote_clear_queue_msg)
+                    .setPositiveButton(R.string.remote_clear_button, (d, w) -> {
                         remoteManager.sendRemoteCommand("command", "clear_queue");
-                        Toast.makeText(this, "TV Queue Cleared", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.remote_queue_cleared_toast), Toast.LENGTH_SHORT).show();
                     })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(android.R.string.cancel, null)
                     .show();
         });
 
@@ -151,7 +140,7 @@ public class RemoteActivity extends AppCompatActivity
 
     private void playOnRemote(VideoModel video) {
         remoteManager.sendToRemoteQueue(video);
-        Toast.makeText(this, "Playing on TV: " + video.getTitle(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.remote_playing_on_tv_format, video.getTitle()), Toast.LENGTH_SHORT).show();
     }
 
     private void observeViewModel() {

@@ -2,7 +2,6 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_primary">
@@ -133,7 +132,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="-10s"
+                            android:text="@string/player_rewind_feedback"
                             android:textColor="@android:color/white"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -158,7 +157,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="+10s"
+                            android:text="@string/player_forward_feedback"
                             android:textColor="@android:color/white"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -267,7 +266,6 @@
 
                     <!-- Video Details -->
                     <LinearLayout
-                        android:id="@+id/layoutVideoInfo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -378,7 +376,6 @@
                         android:paddingTop="12dp">
 
                         <TextView
-                            android:id="@+id/txtRelatedSectionTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="16dp"
@@ -425,43 +422,12 @@
                             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
                         <TextView
-                            android:id="@+id/txtNoRelated"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:padding="32dp"
                             android:textColor="@color/text_secondary"
                             android:visibility="gone" />
-                    </LinearLayout>
-
-                    <!-- Gesture indicators -->
-                    <LinearLayout
-                        android:id="@+id/layoutGestureIndicator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:alpha="0"
-                        android:background="@drawable/bg_top_gradient"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="20dp"
-                        android:visibility="gone">
-
-                        <ImageView
-                            android:id="@+id/ivGestureIcon"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:contentDescription="@null"
-                            app:tint="@android:color/white" />
-
-                        <TextView
-                            android:id="@+id/tvGestureValue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:textColor="@android:color/white"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
                     </LinearLayout>
 
                     <!-- Autoplay Countdown -->
@@ -486,10 +452,10 @@
                             android:id="@+id/tvAutoplaySeconds"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="5"
                             android:textColor="?attr/colorPrimary"
                             android:textSize="48sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="5" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSkipCountdown"

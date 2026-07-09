@@ -5,7 +5,6 @@
     <color name="bg_primary">#0B0E14</color>
     <color name="bg_surface">#12171F</color>
     <color name="bg_surface2">#181E29</color>
-    <color name="surface_translucent">#D912171F</color>
 
     <!-- ── Borders / dividers ────────────────────────────────────────────── -->
     <color name="divider">#1F2937</color>

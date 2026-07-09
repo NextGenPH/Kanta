@@ -6,7 +6,6 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,7 +19,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.nextgen.updater.NextGenUpdater;
 import com.sns.kanta.databinding.ActivitySplashBinding;
 
 public class SplashActivity extends AppCompatActivity {
@@ -47,7 +45,7 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Apply saved theme before onCreate
+
         SharedPreferences prefs = getSharedPreferences("player_prefs", MODE_PRIVATE);
         int savedTheme = prefs.getInt("app_theme", androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(savedTheme);
@@ -62,27 +60,22 @@ public class SplashActivity extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
             Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets cutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
-            
+
             int topSafe = Math.max(insets.top, cutout.top);
             int bottomSafe = insets.bottom;
-            
+            int leftSafe = insets.left;
+            int rightSafe = insets.right;
+
             binding.progressBar.setTranslationY(-bottomSafe);
             binding.errorLayout.setPadding(
-                    binding.errorLayout.getPaddingLeft(),
-                    binding.errorLayout.getPaddingTop() + topSafe,
-                    binding.errorLayout.getPaddingRight(),
-                    binding.errorLayout.getPaddingBottom() + bottomSafe
+                    leftSafe + (int) (16 * getResources().getDisplayMetrics().density),
+                    topSafe,
+                    rightSafe + (int) (16 * getResources().getDisplayMetrics().density),
+                    bottomSafe
             );
-            
-            v.setPadding(insets.left, 0, insets.right, 0);
-            
+
             return WindowInsetsCompat.CONSUMED;
         });
-
-        // Check for updates conditionally (only when online) to prevent library thread crashes
-        if (isNetworkConnected()) {
-            NextGenUpdater.checkForUpdates(this, true);
-        }
 
         setupRetryButton();
         startSplashSequence();
@@ -91,7 +84,7 @@ public class SplashActivity extends AppCompatActivity {
     private void setupRetryButton() {
         binding.btnRetry.setOnClickListener(v -> {
             if (retryCount >= MAX_RETRIES) {
-                Toast.makeText(this, "Maximum retries reached. Please check your internet and restart.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.splash_max_retries_error, Toast.LENGTH_LONG).show();
                 return;
             }
             retryCount++;
@@ -105,7 +98,7 @@ public class SplashActivity extends AppCompatActivity {
             isProceedingStarted = false;
 
             // Clean up previous callback and timeout before retrying
-            if (networkCallback != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (networkCallback != null) {
                 ConnectivityManager connectivityManager = (ConnectivityManager)
                         getSystemService(CONNECTIVITY_SERVICE);
                 try {
@@ -132,15 +125,10 @@ public class SplashActivity extends AppCompatActivity {
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         if (cm == null) return false;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Network activeNetwork = cm.getActiveNetwork();
-            if (activeNetwork == null) return false;
-            NetworkCapabilities capabilities = cm.getNetworkCapabilities(activeNetwork);
-            return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
-        } else {
-            android.net.NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        }
+        Network activeNetwork = cm.getActiveNetwork();
+        if (activeNetwork == null) return false;
+        NetworkCapabilities capabilities = cm.getNetworkCapabilities(activeNetwork);
+        return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
     }
 
     private void checkNetworkConnection() {
@@ -154,31 +142,25 @@ public class SplashActivity extends AppCompatActivity {
         ConnectivityManager connectivityManager = (ConnectivityManager)
                 getSystemService(CONNECTIVITY_SERVICE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            NetworkRequest networkRequest = new NetworkRequest.Builder()
-                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                    .build();
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
 
-            networkCallback = new ConnectivityManager.NetworkCallback() {
-                @Override
-                public void onAvailable(@NonNull Network network) {
-                    mainHandler.post(() -> {
-                        mainHandler.removeCallbacks(networkTimeoutRunnable);
-                        if (!isNetworkCheckComplete && !isActivityFinishing) {
-                            isNetworkCheckComplete = true;
-                            isConnected = true;
-                            checkAndProceed();
-                        }
-                    });
-                }
-            };
-            connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
-            mainHandler.postDelayed(networkTimeoutRunnable, 3000);
-        } else {
-            isNetworkCheckComplete = true;
-            isConnected = false;
-            checkAndProceed();
-        }
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                mainHandler.post(() -> {
+                    mainHandler.removeCallbacks(networkTimeoutRunnable);
+                    if (!isNetworkCheckComplete && !isActivityFinishing) {
+                        isNetworkCheckComplete = true;
+                        isConnected = true;
+                        checkAndProceed();
+                    }
+                });
+            }
+        };
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
+        mainHandler.postDelayed(networkTimeoutRunnable, 3000);
     }
 
     private void checkAndProceed() {
@@ -222,7 +204,7 @@ public class SplashActivity extends AppCompatActivity {
         isActivityFinishing = true;
         mainHandler.removeCallbacksAndMessages(null);
 
-        if (networkCallback != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (networkCallback != null) {
             ConnectivityManager connectivityManager = (ConnectivityManager)
                     getSystemService(CONNECTIVITY_SERVICE);
             try {

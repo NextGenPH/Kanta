@@ -10,36 +10,43 @@
     android:focusable="true"
     android:orientation="vertical">
 
-    <!-- ── Thumbnail ── -->
-    <FrameLayout
+    <!-- ── Thumbnail (Fixed 16:9 Aspect Ratio) ── -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="210dp">
+        android:layout_height="wrap_content">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivThumbnail"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:background="@color/bg_surface2"
             android:contentDescription="@string/cd_video_thumbnail"
             android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="H,16:9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Kanta.ThumbnailLarge"
             tools:src="@drawable/ic_thumbnail_placeholder" />
 
-        <!-- Duration badge — shown when available -->
+        <!-- Duration badge -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
             android:layout_margin="8dp"
-            android:background="#E6000000"
-            android:paddingHorizontal="5dp"
+            android:background="@drawable/bg_duration_badge"
+            android:paddingHorizontal="6dp"
             android:paddingVertical="2dp"
-            android:text="4:20"
             android:textColor="@android:color/white"
             android:textSize="11sp"
             android:textStyle="bold"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/ivThumbnail"
+            app:layout_constraintEnd_toEndOf="@id/ivThumbnail"
+            tools:text="4:20"
+            tools:visibility="visible" />
 
-    </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- ── Info Row ── -->
     <LinearLayout
@@ -57,9 +64,11 @@
             android:layout_height="36dp"
             android:layout_marginTop="2dp"
             android:background="@color/bg_surface2"
+            android:contentDescription="@null"
             android:padding="6dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_profile"
+            android:visibility="gone"
             app:shapeAppearanceOverlay="@style/ShapeAppearance.Kanta.Circular"
             app:strokeColor="@color/divider"
             app:strokeWidth="0.5dp"
@@ -97,7 +106,6 @@
                 tools:text="Channel Name" />
 
             <LinearLayout
-                android:id="@+id/layoutFeedStats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
@@ -146,12 +154,12 @@
         <!-- More Options -->
         <ImageView
             android:id="@+id/btnMenu"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="top"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/cd_more_options"
-            android:padding="8dp"
+            android:padding="12dp"
             android:src="@drawable/ic_more_vert"
             app:tint="@color/text_secondary" />
 

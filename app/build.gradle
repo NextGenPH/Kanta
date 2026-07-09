@@ -19,8 +19,8 @@ android {
         applicationId "com.sns.kanta"
         minSdk 24
         targetSdk 37
-        versionCode 10
-        versionName "1.1.0"
+        versionCode 12
+        versionName "1.1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         
@@ -39,11 +39,11 @@ android {
 
     signingConfigs {
         release {
-            // To be filled by user in local.properties or gradle.properties
-            storeFile file("release-key.jks")
-            storePassword "password"
-            keyAlias "key-alias"
-            keyPassword "password"
+            // Pull credentials from local.properties for security
+            storeFile file(localProperties.getProperty("RELEASE_STORE_FILE") ?: "release-key.jks")
+            storePassword localProperties.getProperty("RELEASE_STORE_PASSWORD") ?: "password"
+            keyAlias localProperties.getProperty("RELEASE_KEY_ALIAS") ?: "key-alias"
+            keyPassword localProperties.getProperty("RELEASE_KEY_PASSWORD") ?: "password"
         }
     }
 
@@ -53,7 +53,7 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             debuggable false
-            // signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
         }
 
         debug {

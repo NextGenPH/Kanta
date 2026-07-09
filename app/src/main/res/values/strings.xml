@@ -3,32 +3,18 @@
 
     <!-- ── Onboarding ────────────────────────────────────────────────────── -->
     <string name="onboarding_title_1">Welcome to Kanta</string>
-    <string name="onboarding_desc_1">Sing your heart out with thousands of karaoke songs from YouTube.</string>
-    <string name="onboarding_title_2">Search and Play</string>
-    <string name="onboarding_desc_2">Find your favorite songs by title or artist and start singing instantly.</string>
-    <string name="onboarding_title_3">Endless Karaoke</string>
-    <string name="onboarding_desc_3">Kanta automatically plays related songs so the music never stops.</string>
+    <string name="onboarding_desc_1">Discover and enjoy karaoke videos from your favorite YouTube channels—all in one simple and easy-to-use app.</string>
+    <string name="onboarding_title_2">Find Your Favorite Songs</string>
+    <string name="onboarding_desc_2">Search by song title or artist and start singing in seconds with fast, accurate results.</string>
+    <string name="onboarding_title_3">Keep the Music Going</string>
+    <string name="onboarding_desc_3">Continue your karaoke session with related song recommendations, making it easy to enjoy more music without searching again.</string>
     <string name="btn_skip">Skip</string>
     <string name="btn_get_started">Get Started</string>
-
-    <!-- ── Updates ────────────────────────────────────────────────────────── -->
-    <string name="update_available">Update Available</string>
-    <string name="update_required">Update Required</string>
-    <string name="update_whats_new">What\'s New:</string>
-    <string name="update_force_hint">This update is required to continue using the app.</string>
-    <string name="update_downloading">Downloading…</string>
-    <string name="update_download_started">Download started…</string>
-    <string name="update_notification_title">Downloading Kanta Update</string>
-    <string name="update_notification_desc">Version %1$s</string>
-    <string name="update_version_label">Version %1$s</string>
-    <string name="btn_update_now">Update Now</string>
-    <string name="btn_later">Later</string>
 
     <!-- ── App ───────────────────────────────────────────────────────────── -->
     <string name="app_name">Kanta</string>
     <string name="profile_edit_name">Edit Name</string>
     <string name="profile_edit_name_hint">Enter your name</string>
-    <string name="profile_data_management">Data Management</string>
     <string name="profile_clear_history">Clear Search History</string>
     <string name="profile_clear_cache">Clear App Cache</string>
     <string name="profile_cache_cleared">App cache cleared</string>
@@ -43,11 +29,9 @@
 
     <!-- ── Content descriptions ──────────────────────────────────────────── -->
     <string name="cd_fullscreen">Toggle fullscreen</string>
-    <string name="cd_stop">Stop playback</string>
     <string name="cd_next">Next song</string>
     <string name="cd_video_thumbnail">Video thumbnail</string>
     <string name="cd_play_pause">Play or Pause</string>
-    <string name="cd_rewind">Rewind 10 seconds</string>
     <string name="cd_search">Search songs</string>
     <string name="cd_profile">View profile</string>
     <string name="cd_more_options">More options</string>
@@ -56,50 +40,20 @@
     <string name="cd_mute">Mute or Unmute</string>
     <string name="cd_voice_search">Voice search</string>
     <string name="btn_back">Back</string>
-    <string name="recommended_feed">Recommended</string>
 
     <!-- ── Player screen ──────────────────────────────────────────────────── -->
-    <string name="label_now_playing">NOW PLAYING :</string>
-    <string name="no_song_playing">No song playing</string>
-    <string name="fallback_title">Waiting for next song…</string>
     <string name="next_song_playing">Now playing: %1$s</string>
     <string name="help_title">Quick Guide</string>
-    <string name="help_message">• Player: Tap the video to show playback controls and voice search.
-• Search: Find songs by title/artist or use the mic icon for voice search.
-• Direct Play: Simply tap any song to start singing immediately.
-• Autoplay: When a song ends, Kanta automatically plays a related song.
-• Fullscreen: Rotate your phone or tap the expand icon to fill the screen.</string>
-    <string name="btn_got_it">Got it</string>
-    <!-- Resume Banner -->
-    <string name="resume_label">Previous Session</string>
-    <string name="jump_back_in">Jump Back In</string>
-    <string name="btn_resume">Resume</string>
-    <string name="btn_dismiss">Dismiss</string>
-
-    <!-- ── Queue ──────────────────────────────────────────────────────────── -->
-    <string name="queue_info_title">Queue Information</string>
-    <string name="queue_empty_message">Queue is empty.
-
-Tap Reserve from the main screen to add songs.</string>
-
 
     <!-- ── Search dialog ──────────────────────────────────────────────────── -->
-    <string name="search_title">Search Songs</string>
     <string name="search_hint">Search song title…</string>
     <string name="search_prompt">Type or speak to search for songs…</string>
     <string name="recent_searches">Recent Searches</string>
-    <string name="btn_clear_history">Clear History</string>
-    <string name="search_found_zero">Found 0 songs</string>
-    <string name="search_found_count">Found %1$d songs</string>
     <string name="search_no_results">No songs found.
 Try a different keyword.</string>
-    <string name="search_error">Error: %1$s</string>
-    <string name="searching">Searching…</string>
     <string name="trending_label">🔥 Trending Now</string>
-    <string name="voice_search_prompt">Search for a song…</string>
 
     <!-- ── Buttons ────────────────────────────────────────────────────────── -->
-    <string name="btn_stop">Stop</string>
     <string name="btn_next">Next</string>
     <string name="btn_previous">Previous</string>
     <string name="btn_close">Close</string>
@@ -107,66 +61,28 @@ Try a different keyword.</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_ok">OK</string>
     <string name="nav_home">Home</string>
-    <string name="nav_reserve">Play</string>
     <string name="nav_search">Search</string>
     <string name="nav_remote">Remote</string>
     <string name="nav_profile">You</string>
-    <string name="btn_post">Post</string>
-    <string name="nav_settings">Profile</string>
     <string name="profile_title">User Profile</string>
     <string name="profile_default_name">Kanta User</string>
     <string name="profile_default_tagline">Karaoke Enthusiast</string>
-    <string name="profile_songs_sung">Songs Sung</string>
     <string name="profile_theme">App Theme</string>
     <string name="profile_theme_light">Light</string>
     <string name="profile_theme_night">Night</string>
     <string name="profile_theme_system">System Default</string>
     <string name="profile_policy">Privacy Policy</string>
     <string name="profile_disclaimer">Disclaimer</string>
-    <string name="disclaimer_title">Legal Disclaimer</string>
-    <string name="disclaimer_content">Kanta is a third-party player for YouTube content. All videos, music, and metadata are provided by YouTube services. Kanta does not host any content and is not affiliated with Google or YouTube. Users must comply with YouTube Terms of Service while using this application.</string>
-    <string name="policy_title">Privacy Policy</string>
-    <string name="policy_content">Kanta respects your privacy. We do not collect personal identification information. All user data such as history and app settings are stored locally on your device. Search queries are sent directly to YouTube via their public API to provide search results.</string>
-    <string name="exit_title">Exit Karaoke?</string>
-    <string name="exit_message">You have %1$d song(s) in your queue.
 
-Exiting will remove all reserved songs.</string>
-    <string name="btn_stay">Stay</string>
-
-    <string name="btn_exit">Exit</string>
-    <string name="toast_queue_saved">Queue saved for next session</string>
-    <string name="snack_song_removed">Song removed from queue</string>
-    <string name="btn_undo">Undo</string>
+    <string name="menu_donate">Donate</string>
+    <string name="menu_quick_guide">Quick Guide</string>
 
     <!-- ── Splash screen ─────────────────────────────────────────────────── -->
-    <string name="splash_tagline">Sing Your Heart Out</string>
     <string name="error_no_internet">No Internet Connection</string>
-    <string name="error_check_connection">Please check your connection</string>
+    <string name="error_check_connection">Please check your internet connection and try again.</string>
     <string name="btn_retry">Retry</string>
 
-    <!-- ── Toast messages ─────────────────────────────────────────────────── -->
-    <string name="toast_stopped">Stopped</string>
-    <string name="toast_already_queued">Already in queue</string>
-    <string name="toast_queue_cleared">Queue cleared</string>
-    <string name="toast_speech_unsupported">Speech recognition is not supported on this device</string>
-    <string name="toast_mic_denied">Microphone permission is needed for voice search</string>
-
-    <string name="welcome_hint">Welcome! Search and reserve songs to start the party.</string>
-    <string name="queue_one_more">and 1 more song</string>
-    <string name="queue_more">and %1$d more songs</string>
-
-    <!-- Related songs -->
-    <string name="related_title">Related Songs</string>
-    <string name="related_searching">Searching for %1$s…</string>
-    <string name="related_more_from">More from %1$s</string>
-    <string name="related_none_found">No other songs found for %1$s</string>
-    <string name="related_songs_error">Error loading related songs: %1$s</string>
-
-    <!-- Toast with title -->
-    <string name="toast_added_title">Added: %1$s</string>
-
     <string name="label_source">Source: %1$s</string>
-    <string name="search_error_toast">Search error: %1$s</string>
     <string name="search_failed">Search failed. Please try again.</string>
 
     <!-- Player Screen Additions -->
@@ -178,7 +94,6 @@ Exiting will remove all reserved songs.</string>
     <string name="label_next_song_in">Next song in...</string>
     <string name="btn_play_now">Play Now</string>
     <string name="btn_back_to_trending">Back to Trending</string>
-    <string name="loading_more">Loading more songs…</string>
     <string name="error_empty_feed">No songs found in this category.</string>
 
     <!-- Remote Screen -->
@@ -230,5 +145,48 @@ Exiting will remove all reserved songs.</string>
     <string name="menu_play_later">Save to Play Later</string>
     <string name="menu_share">Share</string>
     <string name="menu_report">Report</string>
+
+    <!-- Player Feedback & Overlays -->
+    <string name="player_rewind_feedback">-10s</string>
+    <string name="player_forward_feedback">+10s</string>
+    <string name="player_no_more_related">No more related songs to play.</string>
+    <string name="player_up_next_format">Up next: %1$s</string>
+    <string name="player_controls_locked">Controls Locked</string>
+    <string name="player_controls_unlocked">Controls Unlocked</string>
+
+    <!-- Profile Settings & Play Later Shelf -->
+    <string name="profile_play_later">Play Later</string>
+    <string name="profile_play_later_empty">Nothing saved yet</string>
+    <string name="menu_remove_play_later">Remove from Play Later</string>
+    <string name="menu_save_play_later">Save to Play Later</string>
+    <string name="snack_added_play_later">Added to Play Later</string>
+    <string name="snack_removed_play_later">Removed from Play Later</string>
+    <string name="share_video_format">Check out this song on Kanta: %1$s\nhttps://youtu.be/%2$s</string>
+    <string name="share_title">Share song</string>
+
+    <!-- ── Report Dialog ─────────────────────────────────────────────────── -->
+    <string name="report_subtitle">Why are you reporting this video?</string>
+    <string name="report_reason_broken">Video wont play</string>
+    <string name="report_reason_quality">Poor audio or video quality</string>
+    <string name="report_reason_wrong">Incorrect song or version</string>
+    <string name="report_reason_other">Other</string>
+    <string name="report_success">Thanks! Your report has been submitted.</string>
+    <string name="report_failure">Couldnt submit your report. Please check your internet connection and try again.</string>
+
+    <!-- Remote Play TV Actions -->
+    <string name="remote_toggled_mute">Toggled Mute on TV</string>
+    <string name="remote_requesting_fullscreen">Requesting Fullscreen on TV...</string>
+    <string name="remote_queue_cleared_toast">TV Queue Cleared</string>
+    <string name="remote_playing_on_tv_format">Playing on TV: %1$s</string>
+    <string name="remote_clear_button">Clear</string>
+
+    <!-- Splash & Network Handlers -->
+    <string name="splash_max_retries_error">Maximum retries reached. Please check your internet and restart.</string>
+    <string name="error_timeout">Connection Timeout</string>
+    <string name="error_network">Network Error Occurred</string>
+
+    <!-- Dynamic Plays Formatting -->
+    <string name="plays_count_format">%1$s plays</string>
+    <string name="zero_plays">0 plays</string>
 
 </resources>

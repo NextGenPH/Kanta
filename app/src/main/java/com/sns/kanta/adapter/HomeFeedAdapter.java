@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.sns.kanta.R;
 import com.sns.kanta.model.VideoModel;
 
@@ -58,32 +59,35 @@ public class HomeFeedAdapter extends RecyclerView.Adapter<HomeFeedAdapter.ViewHo
         holder.tvChannelName.setText(song.getArtistOrChannel());
 
         Long playCount = song.getPlayCount();
-        if (playCount != null && playCount > 0) {
-            holder.tvPlayCount.setText(formatPlayCount(playCount) + " plays");
-            holder.ivPlayCount.setVisibility(View.VISIBLE);
-            holder.tvPlayCount.setVisibility(View.VISIBLE);
-        } else {
-            holder.tvPlayCount.setText("0 plays");
-            holder.ivPlayCount.setVisibility(View.VISIBLE);
+        if (holder.tvPlayCount != null) {
+            if (playCount != null && playCount > 0) {
+                holder.tvPlayCount.setText(context.getString(R.string.plays_count_format, formatPlayCount(playCount)));
+            } else {
+                holder.tvPlayCount.setText(context.getString(R.string.zero_plays));
+            }
             holder.tvPlayCount.setVisibility(View.VISIBLE);
         }
+        if (holder.ivPlayCount != null) holder.ivPlayCount.setVisibility(View.VISIBLE);
 
         String rawDate = song.getPublishedAt();
         if (rawDate == null || rawDate.isEmpty()) {
             rawDate = song.getCreatedAt();
         }
-        if (rawDate != null && !rawDate.isEmpty()) {
+
+        boolean hasDate = rawDate != null && !rawDate.isEmpty();
+        if (hasDate && holder.tvPublishedDate != null) {
             holder.tvPublishedDate.setText(com.sns.kanta.helper.TimeUtils.getRelativeTime(rawDate));
-            holder.ivCalendar.setVisibility(View.VISIBLE);
             holder.tvPublishedDate.setVisibility(View.VISIBLE);
+            if (holder.ivCalendar != null) holder.ivCalendar.setVisibility(View.VISIBLE);
         } else {
-            holder.ivCalendar.setVisibility(View.GONE);
-            holder.tvPublishedDate.setVisibility(View.GONE);
+            if (holder.tvPublishedDate != null) holder.tvPublishedDate.setVisibility(View.GONE);
+            if (holder.ivCalendar != null) holder.ivCalendar.setVisibility(View.GONE);
         }
 
         Glide.with(context)
                 .load(song.getThumbnail())
                 .placeholder(R.drawable.ic_thumbnail_placeholder)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .centerCrop()
                 .into(holder.ivThumbnail);
 

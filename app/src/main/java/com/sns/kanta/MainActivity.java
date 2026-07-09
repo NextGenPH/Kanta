@@ -9,13 +9,14 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.nextgen.updater.NextGenUpdater;
 import com.sns.kanta.adapter.HomeFeedAdapter;
 import com.sns.kanta.databinding.ActivityMainBinding;
 import com.sns.kanta.helper.RemoteManager;
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         remoteManager = RemoteManager.getInstance();
 
+        NextGenUpdater.checkForUpdates(this, true);
+
         setupWindowInsets();
         setupToolbar();
         setupFeed();
@@ -67,36 +70,24 @@ public class MainActivity extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
             Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
-            
-            // For AppBarLayout, we handle top insets (status bar + notch)
-            int topInset = Math.max(systemBars.top, displayCutout.top);
-            binding.appBarLayout.setPadding(
-                binding.appBarLayout.getPaddingLeft(),
-                topInset,
-                binding.appBarLayout.getPaddingRight(),
-                binding.appBarLayout.getPaddingBottom()
-            );
-            
-            // For bottomContainer, we handle bottom insets (nav bar)
-            binding.bottomContainer.setPadding(
-                binding.bottomContainer.getPaddingLeft(),
-                binding.bottomContainer.getPaddingTop(),
-                binding.bottomContainer.getPaddingRight(),
-                systemBars.bottom
-            );
-            
-            // RecyclerView needs padding to clear the bottom UI + system nav bar
-            int baseBottomPadding = (int) (76 * getResources().getDisplayMetrics().density);
+
+            // Fixed top (Toolbar doesn't scroll)
+            int topSafe = Math.max(systemBars.top, displayCutout.top);
+            binding.appBarLayout.setPadding(0, topSafe, 0, 0);
+
+            // Fixed bottom (Container has solid background)
+            binding.bottomContainer.setPadding(0, 0, 0, systemBars.bottom);
+
+            // RecyclerView clears the UI but content scrolls behind bottom bar
+            // Mini Player is approx 64dp
+            int miniPlayerHeight = (int) (64 * getResources().getDisplayMetrics().density);
             binding.rvRecentSongs.setPadding(
-                binding.rvRecentSongs.getPaddingLeft(),
-                binding.rvRecentSongs.getPaddingTop(),
-                binding.rvRecentSongs.getPaddingRight(),
-                baseBottomPadding + systemBars.bottom
+                    systemBars.left,
+                    0,
+                    systemBars.right,
+                    miniPlayerHeight + systemBars.bottom
             );
-            
-            // Apply horizontal safe areas (notches in landscape)
-            binding.coordinatorLayout.setPadding(systemBars.left, 0, systemBars.right, 0);
-            
+
             return WindowInsetsCompat.CONSUMED;
         });
     }
@@ -278,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
         container.setPadding(padding, padding / 2, padding, 0);
         container.addView(input);
 
-        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.KantaAlertDialog)
+        androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.KantaAlertDialog)
                 .setTitle("Connect to Web Player")
                 .setMessage("Enter the code shown on your TV.")
                 .setView(container)
@@ -301,7 +292,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .setNegativeButton("Cancel", null)
-                .show();
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        }
+        dialog.show();
+        input.requestFocus();
     }
 
     private void observeViewModel() {

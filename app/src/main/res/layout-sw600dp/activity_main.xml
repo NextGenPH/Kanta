@@ -15,7 +15,6 @@
         app:liftOnScroll="true">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:contentInsetStart="16dp"
@@ -93,63 +92,54 @@
                     android:text="@string/chip_trending" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipNewReleases"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_new_releases" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipPopular"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_popular" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipBrunoMars"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_bruno_mars" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipTaylorSwift"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_taylor_swift" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipEdSheeran"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_ed_sheeran" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipAdele"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_adele" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipBINI"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_bini" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipSB19"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_sb19" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipBenBen"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -182,7 +172,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingBottom="80dp"
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                 app:spanCount="3" />
 
@@ -254,12 +243,5 @@
 
         </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <!-- Placeholder for BottomNav code compatibility -->
-    <View
-        android:id="@+id/bottomNavigationView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -37,9 +37,9 @@ public final class MenuUtils {
         android.view.MenuItem playLaterItem = popup.getMenu().findItem(R.id.menu_play_later);
         if (playLaterItem != null) {
             if (isSaved) {
-                playLaterItem.setTitle("Remove from Play Later");
+                playLaterItem.setTitle(context.getString(R.string.menu_remove_play_later));
             } else {
-                playLaterItem.setTitle("Save to Play Later");
+                playLaterItem.setTitle(context.getString(R.string.menu_save_play_later));
             }
         }
 
@@ -65,7 +65,7 @@ public final class MenuUtils {
             if (id == R.id.menu_play_later) {
                 playLaterManager.togglePlayLater(video, added -> {
                     anchorView.post(() -> {
-                        String msg = added ? "Added to Play Later" : "Removed from Play Later";
+                        String msg = added ? context.getString(R.string.snack_added_play_later) : context.getString(R.string.snack_removed_play_later);
                         com.google.android.material.snackbar.Snackbar.make(anchorView, msg, com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
                     });
                 });
@@ -92,10 +92,10 @@ public final class MenuUtils {
     public static void shareVideo(Context context, VideoModel video) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        String shareMessage = "Check out this song on Kanta: " + video.getTitle() + "\nhttps://youtu.be/" + video.getVideoId();
+        String shareMessage = context.getString(R.string.share_video_format, video.getTitle(), video.getVideoId());
         intent.putExtra(Intent.EXTRA_SUBJECT, video.getTitle());
         intent.putExtra(Intent.EXTRA_TEXT, shareMessage);
-        context.startActivity(Intent.createChooser(intent, "Share song"));
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_title)));
     }
 
     /**
@@ -125,33 +125,38 @@ public final class MenuUtils {
         android.widget.Button btnNext = view.findViewById(R.id.btnReportNext);
         View pbLoading = view.findViewById(R.id.pbReportLoading);
 
+        final String reasonBroken = context.getString(R.string.report_reason_broken);
+        final String reasonQuality = context.getString(R.string.report_reason_quality);
+        final String reasonWrong = context.getString(R.string.report_reason_wrong);
+        final String reasonOther = context.getString(R.string.report_reason_other);
+
         final String[] selectedReason = {null};
 
         Runnable updateSelection = () -> {
-            rbBroken.setChecked("Broken or Not Playing".equals(selectedReason[0]));
-            rbQuality.setChecked("Poor Audio/Video Quality".equals(selectedReason[0]));
-            rbWrong.setChecked("Wrong Song or Version".equals(selectedReason[0]));
-            rbOther.setChecked("Other".equals(selectedReason[0]));
+            rbBroken.setChecked(reasonBroken.equals(selectedReason[0]));
+            rbQuality.setChecked(reasonQuality.equals(selectedReason[0]));
+            rbWrong.setChecked(reasonWrong.equals(selectedReason[0]));
+            rbOther.setChecked(reasonOther.equals(selectedReason[0]));
             btnNext.setEnabled(selectedReason[0] != null);
         };
 
         rowBroken.setOnClickListener(v -> {
-            selectedReason[0] = "Broken or Not Playing";
+            selectedReason[0] = reasonBroken;
             updateSelection.run();
         });
 
         rowQuality.setOnClickListener(v -> {
-            selectedReason[0] = "Poor Audio/Video Quality";
+            selectedReason[0] = reasonQuality;
             updateSelection.run();
         });
 
         rowWrong.setOnClickListener(v -> {
-            selectedReason[0] = "Wrong Song or Version";
+            selectedReason[0] = reasonWrong;
             updateSelection.run();
         });
 
         rowOther.setOnClickListener(v -> {
-            selectedReason[0] = "Other";
+            selectedReason[0] = reasonOther;
             updateSelection.run();
         });
 
@@ -178,7 +183,7 @@ public final class MenuUtils {
                             dialog.dismiss();
                             com.google.android.material.snackbar.Snackbar.make(
                                     anchorView,
-                                    "Thank you. Your report has been submitted.",
+                                    context.getString(R.string.report_success),
                                     com.google.android.material.snackbar.Snackbar.LENGTH_LONG
                             ).show();
                         }
@@ -195,7 +200,7 @@ public final class MenuUtils {
 
                             com.google.android.material.snackbar.Snackbar.make(
                                     view,
-                                    "Submission failed. Please check your network connection.",
+                                    context.getString(R.string.report_failure),
                                     com.google.android.material.snackbar.Snackbar.LENGTH_LONG
                             ).show();
                         }

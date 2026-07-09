@@ -8,10 +8,16 @@ import android.util.Log;
  */
 public class KantaApp extends Application {
     private static final String TAG = "KantaApp";
+    private static KantaApp instance;
+
+    public static KantaApp getInstance() {
+        return instance;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
 
         if (com.sns.kanta.BuildConfig.DEBUG) {
             android.os.StrictMode.setThreadPolicy(new android.os.StrictMode.ThreadPolicy.Builder()

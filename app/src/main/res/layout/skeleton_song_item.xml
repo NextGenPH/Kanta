@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingBottom="8dp">
+    android:paddingBottom="16dp">
 
-    <!-- Full-width thumbnail skeleton — mirrors YouTube card style -->
-    <View
+    <!-- Thumbnail skeleton (Mirrors 16:9) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:background="@color/shimmer_background" />
+        android:layout_height="wrap_content">
 
-    <!-- Metadata row skeleton -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/shimmer_background"
+            app:layout_constraintDimensionRatio="H,16:9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Info row skeleton -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,13 +29,11 @@
         android:paddingHorizontal="12dp"
         android:paddingTop="12dp">
 
-        <!-- Avatar circle skeleton -->
         <View
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:background="@drawable/bg_skeleton_circle" />
 
-        <!-- Text lines skeleton -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -43,14 +51,13 @@
                 android:layout_height="12dp"
                 android:layout_marginTop="6dp"
                 android:background="@color/shimmer_background" />
-
         </LinearLayout>
 
-        <!-- Three-dot skeleton -->
         <View
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center_vertical"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="top"
+            android:layout_marginTop="2dp"
             android:background="@color/shimmer_background" />
 
     </LinearLayout>

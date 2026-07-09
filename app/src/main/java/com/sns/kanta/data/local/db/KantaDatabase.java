@@ -39,6 +39,13 @@ public abstract class KantaDatabase extends RoomDatabase {
             database.execSQL("DROP TABLE IF EXISTS `folders`");
         }
     };
+
+    static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `play_later_songs` (`video_id` TEXT NOT NULL, `title` TEXT, `channel` TEXT, `thumbnail` TEXT, `artist` TEXT, `published_at` TEXT, `created_at` TEXT, `play_count` INTEGER, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`video_id`))");
+        }
+    };
     private static volatile KantaDatabase instance;
 
     public static KantaDatabase getInstance(Context context) {
@@ -50,7 +57,7 @@ public abstract class KantaDatabase extends RoomDatabase {
                                     KantaDatabase.class,
                                     "kanta_db"
                             )
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                             .fallbackToDestructiveMigration()
                             .build();
                 }

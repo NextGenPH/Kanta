@@ -25,7 +25,6 @@ public final class RemoteManager {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final androidx.lifecycle.MutableLiveData<Map<String, Object>> _sessionState = new androidx.lifecycle.MutableLiveData<>();
     public final androidx.lifecycle.LiveData<Map<String, Object>> sessionState = _sessionState;
-    private final java.text.SimpleDateFormat isoFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", java.util.Locale.US);
     private volatile String activeSessionId = null;
     private volatile boolean isRemoteModeEnabled = false;
 
@@ -131,9 +130,8 @@ public final class RemoteManager {
             try {
                 Map<String, Object> body = new HashMap<>();
                 body.put(action, value);
-                // Force an update to 'updated_at' by adding a dummy nonce/timestamp
-                // This ensures the Web Player always sees a "new" event even if the command is the same
-                body.put("updated_at", isoFormat.format(new java.util.Date()));
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", java.util.Locale.US);
+                body.put("updated_at", sdf.format(new java.util.Date()));
 
                 VideoRepository.getInstance().getApiService().updateRemoteState(
                         BuildConfig.SUPABASE_ANON_KEY,
