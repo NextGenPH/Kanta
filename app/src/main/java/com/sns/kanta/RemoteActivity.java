@@ -8,7 +8,6 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -16,14 +15,14 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.sns.kanta.adapter.RelatedSongsAdapter;
+import com.sns.kanta.adapter.SongAdapter;
 import com.sns.kanta.databinding.ActivityRemoteBinding;
 import com.sns.kanta.helper.RemoteManager;
 import com.sns.kanta.model.VideoModel;
 import com.sns.kanta.viewmodel.MainViewModel;
 
 public class RemoteActivity extends AppCompatActivity
-        implements RelatedSongsAdapter.OnAddClickListener {
+        implements SongAdapter.OnSongClickListener {
 
     private ActivityRemoteBinding binding;
     private MainViewModel viewModel;
@@ -44,7 +43,7 @@ public class RemoteActivity extends AppCompatActivity
                 }
             }
     );
-    private RelatedSongsAdapter trendingAdapter;
+    private SongAdapter trendingAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +99,7 @@ public class RemoteActivity extends AppCompatActivity
         });
 
         binding.rvTrending.setLayoutManager(new LinearLayoutManager(this));
-        trendingAdapter = new RelatedSongsAdapter(this, this);
+        trendingAdapter = new SongAdapter(this, SongAdapter.Style.VERTICAL_FEED, this, null);
         binding.rvTrending.setAdapter(trendingAdapter);
 
         binding.btnRemoteNext.setOnClickListener(v -> remoteManager.sendRemoteCommand("command", "skip_next"));
@@ -156,7 +155,7 @@ public class RemoteActivity extends AppCompatActivity
     }
 
     @Override
-    public void onAddClick(@NonNull VideoModel v) {
+    public void onSongClick(VideoModel v) {
         playOnRemote(v);
     }
 }

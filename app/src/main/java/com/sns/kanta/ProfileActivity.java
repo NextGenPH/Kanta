@@ -22,9 +22,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.sns.kanta.adapter.PlayLaterAdapter;
+import com.sns.kanta.adapter.SongAdapter;
 import com.sns.kanta.data.repository.PlayLaterManager;
 import com.sns.kanta.data.repository.RecentSongsManager;
+import com.sns.kanta.helper.AnalyticsManager;
 import com.sns.kanta.helper.SearchHistoryManager;
 import com.sns.kanta.model.VideoModel;
 
@@ -35,7 +36,7 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String KEY_USER_NAME = "user_name";
     private SharedPreferences prefs;
 
-    private PlayLaterAdapter playLaterAdapter;
+    private SongAdapter playLaterAdapter;
     private RecyclerView rvPlayLater;
     private android.view.View layoutPlayLaterEmpty;
     private TextView tvPlayLaterCount;
@@ -59,6 +60,9 @@ public class ProfileActivity extends AppCompatActivity {
         setupButtons();
 
         ((TextView) findViewById(R.id.tvVersionInfo)).setText(getString(R.string.profile_version_info, getString(R.string.app_name), BuildConfig.VERSION_NAME));
+
+        String installationId = AnalyticsManager.getInstance(this).getInstallationId();
+        ((TextView) findViewById(R.id.tvInstallationId)).setText(getString(R.string.profile_user_id, installationId));
     }
 
     private void setupWindowInsets() {
@@ -252,7 +256,7 @@ public class ProfileActivity extends AppCompatActivity {
         tvPlayLaterCount = findViewById(R.id.tvPlayLaterCount);
 
         rvPlayLater.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        playLaterAdapter = new PlayLaterAdapter(this, this::playVideo, this::showPlayLaterMenu);
+        playLaterAdapter = new SongAdapter(this, SongAdapter.Style.PLAY_LATER_CARD, this::playVideo, this::showPlayLaterMenu);
         rvPlayLater.setAdapter(playLaterAdapter);
 
         loadPlayLaterSongs();
@@ -271,7 +275,7 @@ public class ProfileActivity extends AppCompatActivity {
                     String countText = songs.size() == 1 ? "1 song" : songs.size() + " songs";
                     tvPlayLaterCount.setText(countText);
                 }
-                playLaterAdapter.submitList(songs);
+                playLaterAdapter.setSongs(songs);
             });
         });
     }

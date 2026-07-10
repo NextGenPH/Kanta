@@ -11,8 +11,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -32,8 +30,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstan
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions;
-import com.sns.kanta.adapter.FullscreenRelatedAdapter;
-import com.sns.kanta.adapter.RelatedSongsAdapter;
+import com.sns.kanta.adapter.SongAdapter;
 import com.sns.kanta.data.repository.RecentSongsManager;
 import com.sns.kanta.databinding.ActivityPlayerBinding;
 import com.sns.kanta.helper.TextFormatter;
@@ -49,7 +46,7 @@ import java.util.Objects;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
-public class PlayerActivity extends AppCompatActivity implements RelatedSongsAdapter.OnAddClickListener {
+public class PlayerActivity extends AppCompatActivity implements SongAdapter.OnSongClickListener {
 
     private static final long CONTROLS_HIDE_MS = 3500L;
     private final Handler controlsHandler = new Handler(Looper.getMainLooper());
@@ -59,8 +56,8 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
     private MainViewModel viewModel;
     private RecentSongsManager recentSongsManager;
     private GestureDetector gestureDetector;
-    private RelatedSongsAdapter relatedAdapter;
-    private FullscreenRelatedAdapter fsRelatedAdapter;
+    private SongAdapter relatedAdapter;
+    private SongAdapter fsRelatedAdapter;
     private android.os.CountDownTimer autoplayTimer;
     private final PlaybackManager.PlaybackCallback playbackCallback = new PlaybackManager.PlaybackCallback() {
         @Override
@@ -269,13 +266,14 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
 
     private void setupRelatedSongs() {
         binding.rvRelatedSongs.setLayoutManager(new LinearLayoutManager(this));
-        binding.rvRelatedSongs.setHasFixedSize(false);
+        binding.rvRelatedSongs.setHasFixedSize(true);
         binding.rvRelatedSongs.setNestedScrollingEnabled(false);
 
-        relatedAdapter = new RelatedSongsAdapter(this, this);
+        relatedAdapter = new SongAdapter(this, SongAdapter.Style.VERTICAL_FEED, this, null);
         binding.rvRelatedSongs.setAdapter(relatedAdapter);
 
-        fsRelatedAdapter = new FullscreenRelatedAdapter(this, this::loadSongFromVideo);
+        fsRelatedAdapter = new SongAdapter(this, SongAdapter.Style.FULLSCREEN_CARD, this, null);
+        binding.rvFullscreenMoreSongs.setHasFixedSize(true);
         binding.rvFullscreenMoreSongs.setAdapter(fsRelatedAdapter);
     }
 
@@ -329,7 +327,13 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
             }
         });
 
-        binding.controlsOverlay.setOnTouchListener((v, ev) -> gestureDetector.onTouchEvent(ev));
+        binding.controlsOverlay.setOnTouchListener((v, ev) -> {
+            boolean handled = gestureDetector.onTouchEvent(ev);
+            if (ev.getAction() == android.view.MotionEvent.ACTION_UP) {
+                v.performClick();
+            }
+            return handled;
+        });
 
         binding.btnOverlayPlayPause.setOnClickListener(v -> {
             if (playbackManager.isReady()) {
@@ -528,23 +532,16 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
     }
 
     private void hideSystemUI() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            WindowInsetsController c = getWindow().getInsetsController();
-            if (c != null) {
-                c.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-                c.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            }
-        } else {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        }
+        androidx.core.view.WindowInsetsControllerCompat controller =
+                androidx.core.view.WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        controller.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars());
+        controller.setSystemBarsBehavior(androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
     }
 
     private void showSystemUI() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            WindowInsetsController c = getWindow().getInsetsController();
-            if (c != null)
-                c.show(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-        } else getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+        androidx.core.view.WindowInsetsControllerCompat controller =
+                androidx.core.view.WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        controller.show(androidx.core.view.WindowInsetsCompat.Type.systemBars());
     }
 
     private void startAutoplayCountdown() {
@@ -706,7 +703,7 @@ public class PlayerActivity extends AppCompatActivity implements RelatedSongsAda
     }
 
     @Override
-    public void onAddClick(@NonNull VideoModel video) {
+    public void onSongClick(VideoModel video) {
         loadSongFromVideo(video);
     }
 

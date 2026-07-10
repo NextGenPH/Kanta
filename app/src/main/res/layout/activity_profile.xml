@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/bg_primary">
+    android:layout_height="match_parent">
 
     <!-- ── AppBar ── -->
     <com.google.android.material.appbar.AppBarLayout
@@ -624,6 +623,17 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 tools:text="Kanta Version 1.8" />
+
+            <TextView
+                android:id="@+id/tvInstallationId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:alpha="0.6"
+                android:gravity="center"
+                android:textColor="@color/text_secondary"
+                android:textSize="10sp"
+                tools:text="user: 69a239f6-6150-4b8d-a417-034900ebb60c" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

@@ -12,12 +12,28 @@ import com.sns.kanta.data.repository.PlayLaterManager;
 import com.sns.kanta.model.VideoModel;
 import com.sns.kanta.server.ReportRepository;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
 public final class MenuUtils {
 
+    private static java.lang.reflect.Field mPopupField;
+    private static java.lang.reflect.Method setForceShowIconMethod;
+    private static boolean reflectionInitAttempted = false;
+
     private MenuUtils() {
+    }
+
+    private static void tryInitReflection(PopupMenu popup) {
+        if (reflectionInitAttempted) return;
+        reflectionInitAttempted = true;
+        try {
+            mPopupField = PopupMenu.class.getDeclaredField("mPopup");
+            mPopupField.setAccessible(true);
+            Object menuPopupHelper = mPopupField.get(popup);
+            if (menuPopupHelper != null) {
+                setForceShowIconMethod = menuPopupHelper.getClass().getMethod("setForceShowIcon", boolean.class);
+            }
+        } catch (Exception e) {
+            android.util.Log.w("MenuUtils", "Could not initialize reflection for force show icons", e);
+        }
     }
 
     /**
@@ -45,15 +61,11 @@ public final class MenuUtils {
 
         // Force show icons in PopupMenu (Material 3 standard)
         try {
-            Field[] fields = popup.getClass().getDeclaredFields();
-            for (Field field : fields) {
-                if ("mPopup".equals(field.getName())) {
-                    field.setAccessible(true);
-                    Object menuPopupHelper = field.get(popup);
-                    Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
-                    Method setForceShowIcon = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
-                    setForceShowIcon.invoke(menuPopupHelper, true);
-                    break;
+            tryInitReflection(popup);
+            if (mPopupField != null && setForceShowIconMethod != null) {
+                Object menuPopupHelper = mPopupField.get(popup);
+                if (menuPopupHelper != null) {
+                    setForceShowIconMethod.invoke(menuPopupHelper, true);
                 }
             }
         } catch (Exception e) {

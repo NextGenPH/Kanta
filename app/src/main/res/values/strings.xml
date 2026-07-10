@@ -26,6 +26,7 @@
     <string name="profile_clear_history_msg">This will permanently remove all your recent searches.</string>
     <string name="profile_clear_cache_msg">This will free up storage by removing temporary song thumbnails.</string>
     <string name="profile_version_info">%1$s Version %2$s</string>
+    <string name="profile_user_id">user: %1$s</string>
 
     <!-- ── Content descriptions ──────────────────────────────────────────── -->
     <string name="cd_fullscreen">Toggle fullscreen</string>
@@ -60,10 +61,8 @@ Try a different keyword.</string>
     <string name="btn_clear">Clear</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_ok">OK</string>
-    <string name="nav_home">Home</string>
     <string name="nav_search">Search</string>
     <string name="nav_remote">Remote</string>
-    <string name="nav_profile">You</string>
     <string name="profile_title">User Profile</string>
     <string name="profile_default_name">Kanta User</string>
     <string name="profile_default_tagline">Karaoke Enthusiast</string>
@@ -116,26 +115,7 @@ Try a different keyword.</string>
     <string name="chip_bini">BINI</string>
     <string name="chip_sb19">SB19</string>
     <string name="chip_benben">Ben&amp;Ben</string>
-    <string name="chip_moira">Moira Dela Torre</string>
-    <string name="chip_arthur_nery">Arthur Nery</string>
-    <string name="chip_zack_tabudlo">Zack Tabudlo</string>
-    <string name="chip_tj_monterde">TJ Monterde</string>
-    <string name="chip_december_avenue">December Avenue</string>
-    <string name="chip_cup_of_joe">Cup of Joe</string>
-    <string name="chip_parokya">Parokya ni Edgar</string>
-    <string name="chip_eraserheads">Eraserheads</string>
-    <string name="chip_rivermaya">Rivermaya</string>
-    <string name="chip_silent_sanctuary">Silent Sanctuary</string>
-    <string name="chip_regine">Regine Velasquez</string>
-    <string name="chip_sarah">Sarah Geronimo</string>
-    <string name="chip_yeng">Yeng Constantino</string>
-    <string name="chip_gloc9">Gloc-9</string>
-    <string name="chip_the_weeknd">The Weeknd</string>
-    <string name="chip_olivia_rodrigo">Olivia Rodrigo</string>
-    <string name="chip_billie_eilish">Billie Eilish</string>
-    <string name="chip_coldplay">Coldplay</string>
-    <string name="chip_maroon5">Maroon 5</string>
-    <string name="chip_imagine_dragons">Imagine Dragons</string>
+
 
     <!-- Empty State -->
     <string name="empty_state_title">No songs found</string>

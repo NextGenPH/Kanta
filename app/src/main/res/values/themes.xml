@@ -131,8 +131,7 @@
     </style>
 
     <style name="ShapeAppearance.Kanta.ThumbnailSmall" parent="ShapeAppearance.Material3.SmallComponent">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">12dp</item>
+        <item name="cornerSize">0dp</item>
     </style>
 
     <style name="ShapeAppearance.Kanta.ThumbnailLarge" parent="ShapeAppearance.Material3.MediumComponent">

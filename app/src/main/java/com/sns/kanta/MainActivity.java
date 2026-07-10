@@ -17,13 +17,17 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.nextgen.updater.NextGenUpdater;
-import com.sns.kanta.adapter.HomeFeedAdapter;
+import com.sns.kanta.adapter.SongAdapter;
 import com.sns.kanta.databinding.ActivityMainBinding;
 import com.sns.kanta.helper.RemoteManager;
+import com.sns.kanta.model.ArtistModel;
 import com.sns.kanta.model.ReservationModel;
 import com.sns.kanta.model.VideoModel;
 import com.sns.kanta.player.GlobalPlayerManager;
+import com.sns.kanta.server.VideoRepository;
 import com.sns.kanta.viewmodel.MainViewModel;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     );
     private ActivityMainBinding binding;
     private MainViewModel viewModel;
-    private HomeFeedAdapter homeFeedAdapter;
+    private SongAdapter homeFeedAdapter;
     private RemoteManager remoteManager;
 
     @Override
@@ -166,35 +170,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupFilters() {
-        // Restore last selected filter from session if any
-        String lastFilter = viewModel.getCurrentFilter();
-
-        // Find the chip with the text matching lastFilter and check it
-        boolean found = false;
-        for (int i = 0; i < binding.filterChipGroup.getChildCount(); i++) {
-            View child = binding.filterChipGroup.getChildAt(i);
-            if (child instanceof com.google.android.material.chip.Chip) {
-                com.google.android.material.chip.Chip chip = (com.google.android.material.chip.Chip) child;
-                if (chip.getText().toString().equalsIgnoreCase(lastFilter)) {
-                    chip.setChecked(true);
-                    found = true;
-                    // Scroll to this chip
-                    binding.filterScroll.post(() -> {
-                        if (binding != null && binding.filterScroll != null)
-                            binding.filterScroll.smoothScrollTo(chip.getLeft(), 0);
-                    });
-                    break;
+        // Load Top Artists for dynamic chips
+        VideoRepository.getInstance().fetchTopArtists(10, new VideoRepository.ArtistCallback() {
+            @Override
+            public void onSuccess(List<ArtistModel> artists) {
+                if (artists != null && !artists.isEmpty()) {
+                    addArtistChips(artists);
                 }
             }
-        }
 
-        // Fallback to first chip if not found
-        if (!found && binding.filterChipGroup.getChildCount() > 0) {
-            View first = binding.filterChipGroup.getChildAt(0);
-            if (first instanceof com.google.android.material.chip.Chip) {
-                ((com.google.android.material.chip.Chip) first).setChecked(true);
+            @Override
+            public void onError(String message) {
+                // Fail silently, keep static core chips
             }
-        }
+        });
+
+        // Initial core setup...
+        String lastFilter = viewModel.getCurrentFilter();
+        refreshChipSelection(lastFilter);
 
         binding.filterChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (checkedIds.isEmpty()) return;
@@ -212,6 +205,48 @@ public class MainActivity extends AppCompatActivity {
         viewModel.loadFeed(lastFilter, false);
     }
 
+    private void addArtistChips(List<ArtistModel> artists) {
+        String currentFilter = viewModel.getCurrentFilter();
+        for (ArtistModel artist : artists) {
+            com.google.android.material.chip.Chip chip = (com.google.android.material.chip.Chip) getLayoutInflater()
+                    .inflate(R.layout.layout_filter_chip, binding.filterChipGroup, false);
+            chip.setText(artist.getName());
+            chip.setId(View.generateViewId());
+
+            if (artist.getName().equalsIgnoreCase(currentFilter)) {
+                chip.setChecked(true);
+            }
+
+            binding.filterChipGroup.addView(chip);
+        }
+    }
+
+    private void refreshChipSelection(String lastFilter) {
+        boolean found = false;
+        for (int i = 0; i < binding.filterChipGroup.getChildCount(); i++) {
+            View child = binding.filterChipGroup.getChildAt(i);
+            if (child instanceof com.google.android.material.chip.Chip) {
+                com.google.android.material.chip.Chip chip = (com.google.android.material.chip.Chip) child;
+                if (chip.getText().toString().equalsIgnoreCase(lastFilter)) {
+                    chip.setChecked(true);
+                    found = true;
+                    binding.filterScroll.post(() -> {
+                        if (binding != null && binding.filterScroll != null)
+                            binding.filterScroll.smoothScrollTo(chip.getLeft(), 0);
+                    });
+                    break;
+                }
+            }
+        }
+
+        if (!found && binding.filterChipGroup.getChildCount() > 0) {
+            View first = binding.filterChipGroup.getChildAt(0);
+            if (first instanceof com.google.android.material.chip.Chip) {
+                ((com.google.android.material.chip.Chip) first).setChecked(true);
+            }
+        }
+    }
+
     private void setupToolbar() {
         binding.btnRemote.setOnClickListener(v -> {
             if (remoteManager.isRemoteMode()) {
@@ -226,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupFeed() {
         binding.rvRecentSongs.setLayoutManager(new LinearLayoutManager(this));
-        homeFeedAdapter = new HomeFeedAdapter(this, this::onVideoSelected);
+        homeFeedAdapter = new SongAdapter(this, SongAdapter.Style.VERTICAL_FEED, this::onVideoSelected, null);
         binding.rvRecentSongs.setAdapter(homeFeedAdapter);
 
         // Standard RecyclerView scroll listener for pagination

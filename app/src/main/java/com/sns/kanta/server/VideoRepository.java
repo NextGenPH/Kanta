@@ -14,6 +14,7 @@ import com.sns.kanta.BuildConfig;
 import com.sns.kanta.R;
 import com.sns.kanta.core.KantaApp;
 import com.sns.kanta.core.Resource;
+import com.sns.kanta.model.ArtistModel;
 import com.sns.kanta.model.VideoModel;
 
 import java.io.IOException;
@@ -280,6 +281,25 @@ public final class VideoRepository {
         });
     }
 
+    public void fetchTopArtists(int limit, @NonNull ArtistCallback callback) {
+        executor.execute(() -> {
+            try {
+                Call<List<ArtistModel>> call = apiService.getTopArtists(
+                        BuildConfig.SUPABASE_ANON_KEY, "Bearer " + BuildConfig.SUPABASE_ANON_KEY,
+                        "*", "total_plays.desc", limit);
+                Response<List<ArtistModel>> response = call.execute();
+                if (response.isSuccessful() && response.body() != null) {
+                    List<ArtistModel> artists = response.body();
+                    mainHandler.post(() -> callback.onSuccess(artists));
+                } else {
+                    mainHandler.post(() -> callback.onError("Error fetching artists"));
+                }
+            } catch (IOException e) {
+                mainHandler.post(() -> callback.onError(getHumanReadableError(e)));
+            }
+        });
+    }
+
     public void recordSongPlay(@NonNull String videoId, @NonNull RecordPlayCallback callback) {
         executor.execute(() -> {
             try {
@@ -428,6 +448,12 @@ public final class VideoRepository {
 
     public interface PageCallback {
         void onSuccess(List<VideoModel> videos, boolean hasMore);
+
+        void onError(String message);
+    }
+
+    public interface ArtistCallback {
+        void onSuccess(List<ArtistModel> artists);
 
         void onError(String message);
     }

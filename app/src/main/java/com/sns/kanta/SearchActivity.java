@@ -26,13 +26,16 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.sns.kanta.adapter.PopularArtistsAdapter;
 import com.sns.kanta.adapter.SearchHistoryAdapter;
-import com.sns.kanta.adapter.SearchResultAdapter;
+import com.sns.kanta.adapter.SongAdapter;
 import com.sns.kanta.databinding.ActivitySearchBinding;
 import com.sns.kanta.helper.SearchHistoryManager;
+import com.sns.kanta.model.ArtistModel;
 import com.sns.kanta.model.ReservationModel;
 import com.sns.kanta.model.VideoModel;
 import com.sns.kanta.player.GlobalPlayerManager;
+import com.sns.kanta.server.VideoRepository;
 import com.sns.kanta.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
@@ -55,8 +58,9 @@ public class SearchActivity extends AppCompatActivity {
     );
     private MainViewModel viewModel;
     private SearchHistoryManager historyManager;
-    private SearchResultAdapter searchAdapter;
-    private SearchResultAdapter trendingAdapter;
+    private SongAdapter searchAdapter;
+    private SongAdapter trendingAdapter;
+    private PopularArtistsAdapter artistsAdapter;
     private SearchHistoryAdapter historyAdapter;
     private final SearchHistoryManager.HistoryListener historyListener = this::updateHistoryUI;
     private Runnable searchRunnable;
@@ -79,6 +83,7 @@ public class SearchActivity extends AppCompatActivity {
         historyManager.addListener(historyListener);
 
         viewModel.loadTrendingSongs();
+        loadTopArtists();
 
         String initialQuery = getIntent().getStringExtra("query");
         if (initialQuery != null && !initialQuery.isEmpty()) {
@@ -86,12 +91,11 @@ public class SearchActivity extends AppCompatActivity {
             binding.searchInput.setSelection(initialQuery.length());
             performSearch(initialQuery);
         } else {
-            // Auto-focus search input and show keyboard only if no initial query
             binding.searchInput.requestFocus();
             binding.searchInput.postDelayed(() -> {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (imm != null)
-                    imm.showSoftInput(binding.searchInput, InputMethodManager.SHOW_IMPLICIT);
+                    imm.showSoftInput(binding.searchInput, 0);
             }, 200);
         }
     }
@@ -101,24 +105,15 @@ public class SearchActivity extends AppCompatActivity {
             Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
 
-            // 1. Fixed Top Padding for AppBarLayout
             int topSafe = Math.max(systemBars.top, displayCutout.top);
             binding.appBarLayout.setPadding(0, topSafe, 0, 0);
-
-            // 2. Fixed Bottom Padding for system nav bar
             binding.bottomContainer.setPadding(0, 0, 0, systemBars.bottom);
 
-            // 3. Bottom Padding for scrollable lists
-            int bottomSafe = systemBars.bottom;
-            int leftSafe = systemBars.left;
-            int rightSafe = systemBars.right;
-
-            // Add extra padding so content doesn't hide behind mini player (approx 64dp)
             int miniPlayerHeight = (int) (64 * getResources().getDisplayMetrics().density);
+            int totalBottomPadding = systemBars.bottom + miniPlayerHeight;
 
-            binding.recyclerHistory.setPadding(leftSafe, 0, rightSafe, bottomSafe + miniPlayerHeight);
-            binding.recyclerTrending.setPadding(leftSafe, 0, rightSafe, bottomSafe + miniPlayerHeight);
-            binding.recyclerResults.setPadding(leftSafe, 0, rightSafe, bottomSafe + miniPlayerHeight);
+            binding.historySection.setPadding(systemBars.left, 0, systemBars.right, totalBottomPadding);
+            binding.resultsSection.setPadding(systemBars.left, 0, systemBars.right, totalBottomPadding);
 
             return WindowInsetsCompat.CONSUMED;
         });
@@ -205,12 +200,20 @@ public class SearchActivity extends AppCompatActivity {
         });
 
         binding.recyclerResults.setLayoutManager(new LinearLayoutManager(this));
-        searchAdapter = new SearchResultAdapter(this, this::onVideoSelected);
+        searchAdapter = new SongAdapter(this, SongAdapter.Style.HORIZONTAL_LIST, this::onVideoSelected, null);
         binding.recyclerResults.setAdapter(searchAdapter);
 
         binding.recyclerTrending.setLayoutManager(new LinearLayoutManager(this));
-        trendingAdapter = new SearchResultAdapter(this, this::onVideoSelected);
+        trendingAdapter = new SongAdapter(this, SongAdapter.Style.HORIZONTAL_LIST, this::onVideoSelected, null);
         binding.recyclerTrending.setAdapter(trendingAdapter);
+
+        binding.recyclerArtists.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        artistsAdapter = new PopularArtistsAdapter(artistName -> {
+            binding.searchInput.setText(artistName);
+            binding.searchInput.setSelection(artistName.length());
+            performSearch(artistName);
+        });
+        binding.recyclerArtists.setAdapter(artistsAdapter);
 
         binding.recyclerHistory.setLayoutManager(new LinearLayoutManager(this));
         historyAdapter = new SearchHistoryAdapter(new SearchHistoryAdapter.OnHistoryClickListener() {
@@ -238,7 +241,6 @@ public class SearchActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString().trim();
                 binding.btnClearSearch.setVisibility(query.isEmpty() ? View.GONE : View.VISIBLE);
-
                 if (query.isEmpty()) {
                     showHistory();
                 } else {
@@ -257,7 +259,7 @@ public class SearchActivity extends AppCompatActivity {
     private void scheduleSearch(String query) {
         if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
         searchRunnable = () -> performSearch(query);
-        searchHandler.postDelayed(searchRunnable, 300);
+        searchHandler.postDelayed(searchRunnable, 400);
     }
 
     private void performSearch(String query) {
@@ -266,6 +268,10 @@ public class SearchActivity extends AppCompatActivity {
         binding.layoutPrompt.setVisibility(View.GONE);
         viewModel.runSearch(query);
         historyManager.addSearchQuery(query);
+
+        // Hide keyboard after starting search
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) imm.hideSoftInputFromWindow(binding.searchInput.getWindowToken(), 0);
     }
 
     private void showHistory() {
@@ -276,11 +282,16 @@ public class SearchActivity extends AppCompatActivity {
         String query = binding.searchInput.getText().toString().trim();
         if (query.isEmpty()) {
             binding.resultsSection.setVisibility(View.GONE);
+            binding.historySection.setVisibility(View.VISIBLE);
+
             if (history.isEmpty()) {
-                binding.historySection.setVisibility(View.GONE);
+                binding.layoutRecentHeader.setVisibility(View.GONE);
+                binding.recyclerHistory.setVisibility(View.GONE);
+                // Prompt is always visible in background of discovery unless blocked by history
                 binding.layoutPrompt.setVisibility(View.VISIBLE);
             } else {
-                binding.historySection.setVisibility(View.VISIBLE);
+                binding.layoutRecentHeader.setVisibility(View.VISIBLE);
+                binding.recyclerHistory.setVisibility(View.VISIBLE);
                 binding.layoutPrompt.setVisibility(View.GONE);
                 historyAdapter.setHistoryItems(history);
             }
@@ -307,6 +318,7 @@ public class SearchActivity extends AppCompatActivity {
                     binding.shimmerSearch.setVisibility(View.VISIBLE);
                     binding.shimmerSearch.startShimmer();
                     binding.recyclerResults.setVisibility(View.GONE);
+                    binding.txtNoResults.setVisibility(View.GONE);
                     break;
                 case SUCCESS:
                     binding.shimmerSearch.stopShimmer();
@@ -314,7 +326,7 @@ public class SearchActivity extends AppCompatActivity {
                     List<VideoModel> results = resource.data != null ? resource.data : new ArrayList<>();
                     binding.recyclerResults.setVisibility(results.isEmpty() ? View.GONE : View.VISIBLE);
                     binding.txtNoResults.setVisibility(results.isEmpty() ? View.VISIBLE : View.GONE);
-                    searchAdapter.updateResults(results);
+                    searchAdapter.setSongs(results);
                     break;
                 case ERROR:
                     binding.shimmerSearch.stopShimmer();
@@ -328,17 +340,31 @@ public class SearchActivity extends AppCompatActivity {
 
         viewModel.trendingSongs.observe(this, songs -> {
             if (songs != null) {
-                // If we are currently in results mode and it was trending-based (chips removed, but logic might remain)
-                // we update the results list too if it's currently showing
-                if (binding.resultsSection.getVisibility() == View.VISIBLE && binding.recyclerResults.getVisibility() == View.VISIBLE) {
-                    searchAdapter.updateResults(songs);
-                    binding.txtNoResults.setVisibility(songs.isEmpty() ? View.VISIBLE : View.GONE);
-                }
-
-                // Always update the recommended trending list in history section
-                trendingAdapter.updateResults(songs);
+                trendingAdapter.setSongs(songs);
                 binding.txtTrendingTitle.setVisibility(songs.isEmpty() ? View.GONE : View.VISIBLE);
                 binding.recyclerTrending.setVisibility(songs.isEmpty() ? View.GONE : View.VISIBLE);
+            }
+        });
+    }
+
+    private void loadTopArtists() {
+        VideoRepository.getInstance().fetchTopArtists(10, new VideoRepository.ArtistCallback() {
+            @Override
+            public void onSuccess(List<ArtistModel> artists) {
+                if (artists != null && !artists.isEmpty()) {
+                    binding.txtArtistsTitle.setVisibility(View.VISIBLE);
+                    binding.recyclerArtists.setVisibility(View.VISIBLE);
+                    artistsAdapter.setArtists(artists);
+                } else {
+                    binding.txtArtistsTitle.setVisibility(View.GONE);
+                    binding.recyclerArtists.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                binding.txtArtistsTitle.setVisibility(View.GONE);
+                binding.recyclerArtists.setVisibility(View.GONE);
             }
         });
     }

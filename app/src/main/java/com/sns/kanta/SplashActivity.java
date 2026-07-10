@@ -20,6 +20,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.sns.kanta.databinding.ActivitySplashBinding;
+import com.sns.kanta.helper.AnalyticsManager;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -177,6 +178,9 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void proceedToNextActivity() {
+        // Track unique installation anonymously
+        AnalyticsManager.getInstance(this).trackInstallation();
+
         SharedPreferences prefs = getSharedPreferences("player_prefs", MODE_PRIVATE);
         boolean onboardingShown = prefs.getBoolean("onboarding_shown", false);
 

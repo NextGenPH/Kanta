@@ -2,30 +2,33 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    app:cardBackgroundColor="@color/bg_surface"
-    app:cardCornerRadius="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="0dp"
     app:cardElevation="0dp"
-    app:rippleColor="@color/ripple_green"
-    app:strokeWidth="0dp">
+    app:strokeWidth="0dp"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:rippleColor="@color/ripple_green">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/contentLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:layout_height="wrap_content">
 
-        <!-- Thumbnail (Strict 16:9) -->
+        <!-- Thumbnail (16:9) -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/thumbnail"
-            android:layout_width="140dp"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/bg_surface2"
             android:contentDescription="@string/cd_video_thumbnail"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_thumbnail_placeholder"
             app:layout_constraintDimensionRatio="H,16:9"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/ShapeAppearance.Kanta.ThumbnailSmall" />
@@ -36,15 +39,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
             android:ellipsize="end"
             android:maxLines="2"
             android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/btnMenu"
-            app:layout_constraintStart_toEndOf="@id/thumbnail"
-            app:layout_constraintTop_toTopOf="@id/thumbnail"
-            tools:text="Song Title Placeholder That Might Span Two Lines" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/thumbnail"
+            tools:text="Song Title Placeholder" />
 
         <TextView
             android:id="@+id/tvChannelName"
@@ -61,11 +65,14 @@
             tools:text="Artist Name" />
 
         <LinearLayout
+            android:id="@+id/metaLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:layout_marginBottom="12dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/title"
             app:layout_constraintStart_toStartOf="@id/title"
             app:layout_constraintTop_toBottomOf="@id/tvChannelName">
@@ -107,6 +114,7 @@
 
         </LinearLayout>
 
+        <!-- Context Menu Button -->
         <ImageView
             android:id="@+id/btnMenu"
             android:layout_width="48dp"
@@ -115,8 +123,9 @@
             android:contentDescription="@string/cd_more_options"
             android:padding="12dp"
             android:src="@drawable/ic_more_vert"
+            app:layout_constraintBottom_toBottomOf="@id/tvChannelName"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@id/title"
             app:tint="@color/text_secondary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

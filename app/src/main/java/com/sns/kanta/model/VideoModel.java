@@ -119,8 +119,8 @@ public final class VideoModel {
 
     private String formatCount(long count) {
         if (count < 1000) return String.valueOf(count);
-        if (count < 1000000) return String.format("%.1fK", count / 1000.0);
-        return String.format("%.1fM", count / 1000000.0);
+        if (count < 1000000) return String.format(java.util.Locale.US, "%.1fK", count / 1000.0);
+        return String.format(java.util.Locale.US, "%.1fM", count / 1000000.0);
     }
 
     @Override

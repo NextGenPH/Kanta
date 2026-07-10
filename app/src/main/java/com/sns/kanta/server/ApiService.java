@@ -1,5 +1,6 @@
 package com.sns.kanta.server;
 
+import com.sns.kanta.model.ArtistModel;
 import com.sns.kanta.model.ReportRequest;
 import com.sns.kanta.model.VideoModel;
 
@@ -111,6 +112,17 @@ public interface ApiService {
             @Query("video_id") String videoIdFilter
     );
 
+    // ── ARTIST DISCOVERY ──────────────────────────────────────────────────
+
+    @GET("rest/v1/top_artists")
+    Call<List<ArtistModel>> getTopArtists(
+            @Header("apikey") String apiKey,
+            @Header("Authorization") String auth,
+            @Query("select") String select,
+            @Query("order") String order,
+            @Query("limit") int limit
+    );
+
     // ── REMOTE MODE SYSTEM ──────────────────────────────────────────────────
 
     @POST("rest/v1/remote_queue")
@@ -148,5 +160,16 @@ public interface ApiService {
             @Header("apikey") String apiKey,
             @Header("Authorization") String auth,
             @Body ReportRequest body
+    );
+
+    @POST("rest/v1/app_analytics?on_conflict=installation_id")
+    @Headers({
+            "Prefer: resolution=merge-duplicates",
+            "Content-Type: application/json"
+    })
+    Call<Void> trackInstallation(
+            @Header("apikey") String apiKey,
+            @Header("Authorization") String auth,
+            @Body Map<String, String> body
     );
 }
