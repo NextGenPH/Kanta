@@ -1,26 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- ── App backgrounds ───────────────────────────────────────────────── -->
     <color name="bg_primary">#F8FAFC</color>
     <color name="bg_surface">#FFFFFF</color>
     <color name="bg_surface2">#F1F5F9</color>
 
-    <!-- ── Borders / dividers ────────────────────────────────────────────── -->
     <color name="divider">#E2E8F0</color>
 
-    <!-- ── Text ──────────────────────────────────────────────────────────── -->
     <color name="text_primary">#0F172A</color>
     <color name="text_secondary">#64748B</color>
 
-    <!-- ── Accent ────────────────────────────────────────────────────────── -->
     <color name="accent_green">#27AE60</color>
     <color name="accent_green_dark">#219150</color>
 
-    <!-- ── Semantic ──────────────────────────────────────────────────────── -->
-
-    <!-- ── Ripple ────────────────────────────────────────────────────────── -->
-    <color name="ripple_green">##1F1A1A1A</color>
+    <color name="ripple_light_black">#1F1A1A1A</color>
     <color name="shimmer_background">#E2E8F0</color>
 
 </resources>

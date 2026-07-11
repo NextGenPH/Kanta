@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     style="@style/Widget.Material3.Chip.Filter"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
+    android:layout_height="wrap_content"
+    android:checkable="true"
+    android:clickable="true"
+    android:focusable="true"
+    android:textAppearance="?attr/textAppearanceLabelLarge"
+    app:chipIconTint="?attr/colorOnSurfaceVariant"
+    app:chipStrokeColor="?attr/colorOutline"
+    tools:checked="true" />

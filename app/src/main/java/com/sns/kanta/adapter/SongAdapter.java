@@ -73,9 +73,6 @@ public final class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHold
             case PLAY_LATER_CARD:
                 layoutId = R.layout.item_song_play_later;
                 break;
-            case FULLSCREEN_CARD:
-                layoutId = R.layout.item_song_fullscreen;
-                break;
             default:
                 layoutId = R.layout.item_song_feed;
                 break;
@@ -93,7 +90,7 @@ public final class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHold
             holder.tvChannelName.setText(song.getArtistOrChannel());
         }
 
-        if (style != Style.FULLSCREEN_CARD && style != Style.PLAY_LATER_CARD) {
+        if (style != Style.PLAY_LATER_CARD) {
             Long playCount = song.getPlayCount();
             if (holder.tvPlayCount != null) {
                 if (playCount != null && playCount > 0) {
@@ -155,7 +152,6 @@ public final class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHold
         VERTICAL_FEED,     // Large card (Home feed, related songs list)
         HORIZONTAL_LIST,   // Horizontal list item (Search results list)
         PLAY_LATER_CARD,   // Small horizontal-scroll card (160dp)
-        FULLSCREEN_CARD    // Dark horizontal-scroll card (140dp)
     }
 
     public interface OnSongClickListener {

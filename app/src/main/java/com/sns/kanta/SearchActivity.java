@@ -11,6 +11,7 @@ import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.activity.EdgeToEdge;
@@ -43,27 +44,35 @@ import java.util.List;
 
 public class SearchActivity extends AppCompatActivity {
 
+    private static final int PERMISSION_REQ_CODE_MIC = 101;
+    private static final int MIN_SEARCH_LENGTH = 2;
+    private static final long DEBOUNCE_DELAY_MS = 400;
+
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
     private ActivitySearchBinding binding;
-    private final ActivityResultLauncher<Intent> voiceSearchLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    ArrayList<String> matches = result.getData().getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    if (matches != null && !matches.isEmpty()) {
-                        binding.searchInput.setText(matches.get(0));
-                    }
-                }
-            }
-    );
     private MainViewModel viewModel;
     private SearchHistoryManager historyManager;
+
     private SongAdapter searchAdapter;
     private SongAdapter trendingAdapter;
     private PopularArtistsAdapter artistsAdapter;
     private SearchHistoryAdapter historyAdapter;
+
     private final SearchHistoryManager.HistoryListener historyListener = this::updateHistoryUI;
     private Runnable searchRunnable;
+    private boolean isProgrammaticUpdate = false;
+
+    private final ActivityResultLauncher<Intent> voiceSearchLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    ArrayList<String> matches = result.getData().getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    if (matches != null && !matches.isEmpty()) {
+                        String query = matches.get(0);
+                        updateSearchFieldProgrammatically(query);
+                        executeSearch(query, true, true);
+                    }
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +85,6 @@ public class SearchActivity extends AppCompatActivity {
         historyManager = SearchHistoryManager.getInstance(this);
 
         setupWindowInsets();
-
         setupUI();
         setupMiniPlayer();
         observeViewModel();
@@ -85,19 +93,7 @@ public class SearchActivity extends AppCompatActivity {
         viewModel.loadTrendingSongs();
         loadTopArtists();
 
-        String initialQuery = getIntent().getStringExtra("query");
-        if (initialQuery != null && !initialQuery.isEmpty()) {
-            binding.searchInput.setText(initialQuery);
-            binding.searchInput.setSelection(initialQuery.length());
-            performSearch(initialQuery);
-        } else {
-            binding.searchInput.requestFocus();
-            binding.searchInput.postDelayed(() -> {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm != null)
-                    imm.showSoftInput(binding.searchInput, 0);
-            }, 200);
-        }
+        handleInitialIntent();
     }
 
     private void setupWindowInsets() {
@@ -119,71 +115,25 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-    private void setupMiniPlayer() {
-        GlobalPlayerManager gpm = GlobalPlayerManager.getInstance();
-        View miniPlayerContainer = findViewById(R.id.miniPlayerView);
-        if (miniPlayerContainer == null) return;
-
-        android.widget.TextView miniTitle = miniPlayerContainer.findViewById(R.id.miniTitle);
-        android.widget.TextView miniArtist = miniPlayerContainer.findViewById(R.id.miniArtist);
-        android.widget.ImageView miniThumbnail = miniPlayerContainer.findViewById(R.id.miniThumbnail);
-        android.widget.ImageButton btnMiniPlayPause = miniPlayerContainer.findViewById(R.id.btnMiniPlayPause);
-        android.widget.ImageButton btnMiniClose = miniPlayerContainer.findViewById(R.id.btnMiniClose);
-        com.google.android.material.progressindicator.LinearProgressIndicator miniProgress = miniPlayerContainer.findViewById(R.id.miniProgress);
-
-        gpm.currentSong.observe(this, song -> {
-            if (song != null) {
-                miniPlayerContainer.setVisibility(View.VISIBLE);
-                if (miniTitle != null) miniTitle.setText(song.getTitle());
-                if (miniArtist != null) miniArtist.setText(song.getArtistSafe());
-                if (miniThumbnail != null) {
-                    com.bumptech.glide.Glide.with(this)
-                            .load(song.getThumbnail())
-                            .placeholder(R.drawable.ic_thumbnail_placeholder)
-                            .into(miniThumbnail);
-                }
-            } else {
-                miniPlayerContainer.setVisibility(View.GONE);
-            }
-        });
-
-        gpm.playerState.observe(this, state -> {
-            if (btnMiniPlayPause != null) {
-                if (state == com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants.PlayerState.PLAYING) {
-                    btnMiniPlayPause.setImageResource(R.drawable.ic_pause);
-                } else {
-                    btnMiniPlayPause.setImageResource(R.drawable.ic_play);
-                }
-            }
-        });
-
-        gpm.currentTime.observe(this, time -> {
-            Float duration = gpm.duration.getValue();
-            if (duration != null && duration > 0 && miniProgress != null) {
-                int progress = (int) ((time / duration) * 1000);
-                miniProgress.setProgressCompat(progress, true);
-            }
-        });
-
-        miniPlayerContainer.setOnClickListener(v -> {
-            ReservationModel song = gpm.currentSong.getValue();
-            if (song != null) {
-                onVideoSelected(new VideoModel(song.getVideoId(), song.getTitle(), song.getChannel(), song.getThumbnail(), song.getArtist()));
-            }
-        });
-
-        if (btnMiniClose != null) btnMiniClose.setOnClickListener(v -> gpm.stop());
-        if (btnMiniPlayPause != null)
-            btnMiniPlayPause.setOnClickListener(v -> miniPlayerContainer.performClick());
+    private void handleInitialIntent() {
+        String initialQuery = getIntent().getStringExtra("query");
+        if (initialQuery != null && !initialQuery.isEmpty()) {
+            updateSearchFieldProgrammatically(initialQuery);
+            executeSearch(initialQuery, true, true);
+        } else {
+            binding.searchInput.requestFocus();
+            binding.searchInput.postDelayed(this::showKeyboard, 200);
+        }
     }
 
     private void setupUI() {
         binding.btnBack.setOnClickListener(v -> finish());
 
         binding.btnClearSearch.setOnClickListener(v -> {
-            binding.searchInput.setText("");
-            binding.resultsSection.setVisibility(View.GONE);
+            updateSearchFieldProgrammatically("");
+            cancelPendingSearch();
             showHistory();
+            showKeyboard();
         });
 
         binding.btnClearHistory.setOnClickListener(v -> {
@@ -193,12 +143,13 @@ public class SearchActivity extends AppCompatActivity {
 
         binding.btnMic.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 101);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSION_REQ_CODE_MIC);
             } else {
                 startVoiceSearch();
             }
         });
 
+        // Adapters Initialization
         binding.recyclerResults.setLayoutManager(new LinearLayoutManager(this));
         searchAdapter = new SongAdapter(this, SongAdapter.Style.HORIZONTAL_LIST, this::onVideoSelected, null);
         binding.recyclerResults.setAdapter(searchAdapter);
@@ -209,9 +160,8 @@ public class SearchActivity extends AppCompatActivity {
 
         binding.recyclerArtists.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         artistsAdapter = new PopularArtistsAdapter(artistName -> {
-            binding.searchInput.setText(artistName);
-            binding.searchInput.setSelection(artistName.length());
-            performSearch(artistName);
+            updateSearchFieldProgrammatically(artistName);
+            executeSearch(artistName, true, true);
         });
         binding.recyclerArtists.setAdapter(artistsAdapter);
 
@@ -219,9 +169,8 @@ public class SearchActivity extends AppCompatActivity {
         historyAdapter = new SearchHistoryAdapter(new SearchHistoryAdapter.OnHistoryClickListener() {
             @Override
             public void onHistoryClick(String query) {
-                binding.searchInput.setText(query);
-                binding.searchInput.setSelection(query.length());
-                performSearch(query);
+                updateSearchFieldProgrammatically(query);
+                executeSearch(query, false, true);
             }
 
             @Override
@@ -232,46 +181,92 @@ public class SearchActivity extends AppCompatActivity {
         });
         binding.recyclerHistory.setAdapter(historyAdapter);
 
+        // Edit Text Listeners
         binding.searchInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int i, int c, int a) {
-            }
+            @Override public void beforeTextChanged(CharSequence s, int i, int c, int a) {}
+            @Override public void afterTextChanged(Editable s) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (isProgrammaticUpdate) return;
+
                 String query = s.toString().trim();
                 binding.btnClearSearch.setVisibility(query.isEmpty() ? View.GONE : View.VISIBLE);
+
                 if (query.isEmpty()) {
+                    cancelPendingSearch();
                     showHistory();
+                } else if (query.length() < MIN_SEARCH_LENGTH) {
+                    cancelPendingSearch();
                 } else {
                     scheduleSearch(query);
                 }
             }
+        });
 
-            @Override
-            public void afterTextChanged(Editable s) {
+        binding.searchInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                String query = binding.searchInput.getText().toString().trim();
+                if (query.length() >= MIN_SEARCH_LENGTH) {
+                    executeSearch(query, true, true);
+                } else {
+                    hideKeyboard();
+                }
+                return true;
             }
+            return false;
         });
 
         showHistory();
     }
 
     private void scheduleSearch(String query) {
-        if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
-        searchRunnable = () -> performSearch(query);
-        searchHandler.postDelayed(searchRunnable, 400);
+        cancelPendingSearch();
+        searchRunnable = () -> executeSearch(query, false, false);
+        searchHandler.postDelayed(searchRunnable, DEBOUNCE_DELAY_MS);
     }
 
-    private void performSearch(String query) {
+    private void executeSearch(String query, boolean saveToHistory, boolean hideKeyboardAfterSelection) {
+        String cleanQuery = query.trim();
+        cancelPendingSearch();
+
         binding.historySection.setVisibility(View.GONE);
         binding.resultsSection.setVisibility(View.VISIBLE);
-        binding.layoutPrompt.setVisibility(View.GONE);
-        viewModel.runSearch(query);
-        historyManager.addSearchQuery(query);
 
-        // Hide keyboard after starting search
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null) imm.hideSoftInputFromWindow(binding.searchInput.getWindowToken(), 0);
+        viewModel.runSearch(cleanQuery);
+
+        if (saveToHistory) {
+            saveSearchHistory(cleanQuery);
+        }
+
+        if (hideKeyboardAfterSelection) {
+            hideKeyboard();
+        }
+    }
+
+    private void cancelPendingSearch() {
+        if (searchRunnable != null) {
+            searchHandler.removeCallbacks(searchRunnable);
+            searchRunnable = null;
+        }
+    }
+
+    private void updateSearchFieldProgrammatically(String text) {
+        isProgrammaticUpdate = true;
+        binding.searchInput.setText(text);
+        if (text != null) {
+            binding.searchInput.setSelection(text.length());
+            binding.btnClearSearch.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
+        }
+        isProgrammaticUpdate = false;
+    }
+
+    private void saveSearchHistory(String query) {
+        if (query == null) return;
+        String cleanQuery = query.trim();
+        if (cleanQuery.length() >= MIN_SEARCH_LENGTH) {
+            historyManager.addSearchQuery(cleanQuery);
+        }
     }
 
     private void showHistory() {
@@ -287,18 +282,17 @@ public class SearchActivity extends AppCompatActivity {
             if (history.isEmpty()) {
                 binding.layoutRecentHeader.setVisibility(View.GONE);
                 binding.recyclerHistory.setVisibility(View.GONE);
-                // Prompt is always visible in background of discovery unless blocked by history
-                binding.layoutPrompt.setVisibility(View.VISIBLE);
             } else {
                 binding.layoutRecentHeader.setVisibility(View.VISIBLE);
                 binding.recyclerHistory.setVisibility(View.VISIBLE);
-                binding.layoutPrompt.setVisibility(View.GONE);
                 historyAdapter.setHistoryItems(history);
             }
         }
     }
 
     private void onVideoSelected(VideoModel video) {
+        saveSearchHistory(binding.searchInput.getText().toString());
+
         Intent intent = new Intent(this, PlayerActivity.class);
         intent.putExtra(MainActivity.EXTRA_VIDEO_ID, video.getVideoId());
         intent.putExtra(MainActivity.EXTRA_TITLE, video.getTitle());
@@ -306,7 +300,8 @@ public class SearchActivity extends AppCompatActivity {
         intent.putExtra("extra_thumbnail", video.getThumbnail());
         intent.putExtra("extra_artist", video.getArtist());
 
-        android.app.ActivityOptions options = android.app.ActivityOptions.makeCustomAnimation(this, R.anim.slide_up, R.anim.no_animation);
+        android.app.ActivityOptions options = android.app.ActivityOptions.makeCustomAnimation(
+                this, R.anim.slide_up, R.anim.no_animation);
         startActivity(intent, options.toBundle());
     }
 
@@ -356,17 +351,20 @@ public class SearchActivity extends AppCompatActivity {
                     binding.recyclerArtists.setVisibility(View.VISIBLE);
                     artistsAdapter.setArtists(artists);
                 } else {
-                    binding.txtArtistsTitle.setVisibility(View.GONE);
-                    binding.recyclerArtists.setVisibility(View.GONE);
+                    hideArtistsViews();
                 }
             }
 
             @Override
             public void onError(String message) {
-                binding.txtArtistsTitle.setVisibility(View.GONE);
-                binding.recyclerArtists.setVisibility(View.GONE);
+                hideArtistsViews();
             }
         });
+    }
+
+    private void hideArtistsViews() {
+        binding.txtArtistsTitle.setVisibility(View.GONE);
+        binding.recyclerArtists.setVisibility(View.GONE);
     }
 
     private void startVoiceSearch() {
@@ -375,10 +373,76 @@ public class SearchActivity extends AppCompatActivity {
         voiceSearchLauncher.launch(i);
     }
 
+    private void showKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) imm.showSoftInput(binding.searchInput, 0);
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(binding.searchInput.getWindowToken(), 0);
+        }
+    }
+
+    private void setupMiniPlayer() {
+        GlobalPlayerManager gpm = GlobalPlayerManager.getInstance();
+        View miniPlayerContainer = findViewById(R.id.miniPlayerView);
+        if (miniPlayerContainer == null) return;
+
+        android.widget.TextView miniTitle = miniPlayerContainer.findViewById(R.id.miniTitle);
+        android.widget.TextView miniArtist = miniPlayerContainer.findViewById(R.id.miniArtist);
+        android.widget.ImageView miniThumbnail = miniPlayerContainer.findViewById(R.id.miniThumbnail);
+        android.widget.ImageButton btnMiniPlayPause = miniPlayerContainer.findViewById(R.id.btnMiniPlayPause);
+        android.widget.ImageButton btnMiniClose = miniPlayerContainer.findViewById(R.id.btnMiniClose);
+        com.google.android.material.progressindicator.LinearProgressIndicator miniProgress = miniPlayerContainer.findViewById(R.id.miniProgress);
+
+        gpm.currentSong.observe(this, song -> {
+            if (song != null) {
+                miniPlayerContainer.setVisibility(View.VISIBLE);
+                if (miniTitle != null) miniTitle.setText(song.getTitle());
+                if (miniArtist != null) miniArtist.setText(song.getArtistSafe());
+                if (miniThumbnail != null) {
+                    com.bumptech.glide.Glide.with(this).load(song.getThumbnail()).placeholder(R.drawable.ic_thumbnail_placeholder).into(miniThumbnail);
+                }
+            } else {
+                miniPlayerContainer.setVisibility(View.GONE);
+            }
+        });
+
+        gpm.playerState.observe(this, state -> {
+            if (btnMiniPlayPause != null) {
+                if (state == com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants.PlayerState.PLAYING) {
+                    btnMiniPlayPause.setImageResource(R.drawable.ic_pause);
+                } else {
+                    btnMiniPlayPause.setImageResource(R.drawable.ic_play);
+                }
+            }
+        });
+
+        gpm.currentTime.observe(this, time -> {
+            Float duration = gpm.duration.getValue();
+            if (duration != null && duration > 0 && miniProgress != null) {
+                int progress = (int) ((time / duration) * 1000);
+                miniProgress.setProgressCompat(progress, true);
+            }
+        });
+
+        miniPlayerContainer.setOnClickListener(v -> {
+            ReservationModel song = gpm.currentSong.getValue();
+            if (song != null) {
+                onVideoSelected(new VideoModel(song.getVideoId(), song.getTitle(), song.getChannel(), song.getThumbnail(), song.getArtist()));
+            }
+        });
+
+        if (btnMiniClose != null) btnMiniClose.setOnClickListener(v -> gpm.stop());
+        if (btnMiniPlayPause != null) btnMiniPlayPause.setOnClickListener(v -> miniPlayerContainer.performClick());
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 101 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == PERMISSION_REQ_CODE_MIC && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startVoiceSearch();
         }
     }
@@ -387,6 +451,6 @@ public class SearchActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         historyManager.removeListener(historyListener);
-        if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
+        cancelPendingSearch();
     }
 }

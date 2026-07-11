@@ -11,7 +11,7 @@
     app:cardElevation="0dp"
     app:strokeWidth="0dp"
     app:cardBackgroundColor="@android:color/transparent"
-    app:rippleColor="@color/ripple_green">
+    app:rippleColor="@color/ripple_light_black">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/contentLayout"
@@ -31,7 +31,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.Kanta.ThumbnailSmall" />
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Kanta.ThumbnailLarge" />
 
         <!-- Info Block -->
         <TextView

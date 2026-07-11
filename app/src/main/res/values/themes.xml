@@ -3,23 +3,21 @@
 
     <style name="Theme.Kanta" parent="Theme.Material3.DayNight.NoActionBar">
 
-        <!-- ── Window ───────────────────────────────────────────────────── -->
+        <!-- ── Window Styles ────────────────────────────────────────────── -->
         <item name="android:windowBackground">@color/bg_primary</item>
         <item name="android:statusBarColor">@color/bg_surface</item>
         <item name="android:navigationBarColor">@color/bg_surface</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
 
-        <!-- ── Brand colors ─────────────────────────────────────────────── -->
+        <!-- ── Brand Colors ─────────────────────────────────────────────── -->
         <item name="colorPrimary">@color/accent_green</item>
-        <item name="colorPrimaryVariant">@color/accent_green_dark</item>
         <item name="colorSecondary">@color/accent_green</item>
-        <item name="colorSecondaryVariant">@color/accent_green_dark</item>
         <item name="colorOnPrimary">@color/bg_primary</item>
         <item name="android:colorPrimary">@color/accent_green</item>
         <item name="android:colorAccent">@color/accent_green</item>
 
-        <!-- ── Surface / background ─────────────────────────────────────── -->
+        <!-- ── Surface / Backgrounds ────────────────────────────────────── -->
         <item name="colorSurface">@color/bg_surface</item>
         <item name="colorOnSurface">@color/text_primary</item>
         <item name="android:colorBackground">@color/bg_primary</item>
@@ -27,29 +25,29 @@
         <item name="colorSurfaceVariant">@color/bg_surface2</item>
         <item name="colorOnSurfaceVariant">@color/text_secondary</item>
 
-        <!-- ── Text ─────────────────────────────────────────────────────── -->
+        <!-- ── Typography Defaults ───────────────────────────────────────── -->
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
         <item name="android:textColorHint">@color/text_secondary</item>
 
-        <!-- ── Toolbar ───────────────────────────────────────────────────── -->
+        <!-- ── Toolbar / Action Bars ─────────────────────────────────────── -->
         <item name="actionBarStyle">@style/ThemeOverlay.Kanta.Toolbar</item>
         <item name="toolbarStyle">@style/ThemeOverlay.Kanta.Toolbar</item>
 
-        <!-- ── Components ───────────────────────────────────────────────── -->
+        <!-- ── Component Overrides ───────────────────────────────────────── -->
         <item name="alertDialogTheme">@style/KantaAlertDialog</item>
         <item name="materialAlertDialogTheme">@style/KantaAlertDialog</item>
         <item name="materialButtonStyle">@style/KantaButton</item>
         <item name="bottomSheetDialogTheme">@style/KantaBottomSheetDialog</item>
 
-        <!-- ── Ripple ────────────────────────────────────────────────────── -->
-        <item name="colorControlHighlight">#1A3ECF8E</item>
-        <item name="rippleColor">@color/ripple_green</item>
+        <!-- ── Interactivity / Touch Feedback ───────────────────────────── -->
+        <item name="colorControlHighlight">@color/ripple_light_black</item>
+        <item name="rippleColor">@color/ripple_light_black</item>
 
     </style>
 
-    <!-- Toolbar Style -->
-    <style name="ThemeOverlay.Kanta.Toolbar" parent="ThemeOverlay.Material3.Dark.ActionBar">
+    <!-- Toolbar Overlays -->
+    <style name="ThemeOverlay.Kanta.Toolbar" parent="ThemeOverlay.Material3.ActionBar">
         <item name="android:background">@color/bg_surface</item>
         <item name="background">@color/bg_surface</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
@@ -59,8 +57,7 @@
         <item name="actionMenuTextColor">@color/text_primary</item>
     </style>
 
-    <!-- ── Alert Dialog ───────────────────────────────────────────────────── -->
-
+    <!-- Alert Dialogs Configurations -->
     <style name="KantaAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="android:background">@color/bg_surface2</item>
         <item name="android:windowBackground">@color/bg_surface2</item>
@@ -85,7 +82,7 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textStyle">bold</item>
-        <item name="rippleColor">@color/ripple_green</item>
+        <item name="rippleColor">@color/ripple_light_black</item>
     </style>
 
     <style name="NegativeButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
@@ -100,18 +97,16 @@
         <item name="android:textAllCaps">false</item>
     </style>
 
-    <!-- ── Buttons ────────────────────────────────────────────────────────── -->
-
+    <!-- Component Buttons Styles -->
     <style name="KantaButton" parent="Widget.Material3.Button">
         <item name="backgroundTint">@color/accent_green</item>
-        <item name="android:textColor">@color/bg_primary</item>
+        <item name="android:textColor">@color/bg_surface</item>
         <item name="android:textAllCaps">false</item>
         <item name="cornerRadius">10dp</item>
-        <item name="rippleColor">@color/ripple_green</item>
+        <item name="rippleColor">@color/ripple_light_black</item>
     </style>
 
-    <!-- ── Bottom Sheet ───────────────────────────────────────────────────── -->
-
+    <!-- Bottom Sheet Panels Design -->
     <style name="KantaBottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/KantaBottomSheetModal</item>
     </style>
@@ -122,6 +117,7 @@
         <item name="shapeAppearance">@style/ShapeAppearance.Kanta.BottomSheet</item>
     </style>
 
+    <!-- Global Corner Overlays Shapes Dimensions -->
     <style name="ShapeAppearance.Kanta.BottomSheet" parent="ShapeAppearance.Material3.LargeComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopLeft">24dp</item>
@@ -131,9 +127,9 @@
     </style>
 
     <style name="ShapeAppearance.Kanta.ThumbnailSmall" parent="ShapeAppearance.Material3.SmallComponent">
-        <item name="cornerSize">0dp</item>
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
     </style>
-
     <style name="ShapeAppearance.Kanta.ThumbnailLarge" parent="ShapeAppearance.Material3.MediumComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">0dp</item>
@@ -144,23 +140,17 @@
         <item name="cornerSize">50%</item>
     </style>
 
-    <!-- ── SearchView ─────────────────────────────────────────────────────── -->
-
-    <!-- ── MaterialCardView ──────────────────────────────────────────────── -->
-
+    <!-- Activity Secondary Mode Schemes Extended Blocks -->
     <style name="Theme.Kanta.Player" parent="Theme.Kanta">
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <!-- Splash screen theme — windowBackground matches your dark bg -->
     <style name="Theme.Kanta.Splash" parent="Theme.Kanta">
         <item name="android:windowBackground">@drawable/splash_background</item>
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
-
-    <!-- Theme overlay for BottomNav and NavigationRail to safely customize M3 active indicator colors -->
 
 </resources>

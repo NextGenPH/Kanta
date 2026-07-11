@@ -3,23 +3,21 @@
 
     <style name="Theme.Kanta" parent="Theme.Material3.DayNight.NoActionBar">
 
-        <!-- ── Window ───────────────────────────────────────────────────── -->
+        <!-- ── Window Styles ────────────────────────────────────────────── -->
         <item name="android:windowBackground">@color/bg_primary</item>
         <item name="android:statusBarColor">@color/bg_surface</item>
         <item name="android:navigationBarColor">@color/bg_surface</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
 
-        <!-- ── Brand colors ─────────────────────────────────────────────── -->
+        <!-- ── Brand Colors ─────────────────────────────────────────────── -->
         <item name="colorPrimary">@color/accent_green</item>
-        <item name="colorPrimaryVariant">@color/accent_green_dark</item>
         <item name="colorSecondary">@color/accent_green</item>
-        <item name="colorSecondaryVariant">@color/accent_green_dark</item>
         <item name="colorOnPrimary">@color/bg_primary</item>
         <item name="android:colorPrimary">@color/accent_green</item>
         <item name="android:colorAccent">@color/accent_green</item>
 
-        <!-- ── Surface / background ─────────────────────────────────────── -->
+        <!-- ── Surface / Backgrounds ────────────────────────────────────── -->
         <item name="colorSurface">@color/bg_surface</item>
         <item name="colorOnSurface">@color/text_primary</item>
         <item name="android:colorBackground">@color/bg_primary</item>
@@ -27,24 +25,24 @@
         <item name="colorSurfaceVariant">@color/bg_surface2</item>
         <item name="colorOnSurfaceVariant">@color/text_secondary</item>
 
-        <!-- ── Text ─────────────────────────────────────────────────────── -->
+        <!-- ── Typography Defaults ───────────────────────────────────────── -->
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
         <item name="android:textColorHint">@color/text_secondary</item>
 
-        <!-- ── Toolbar ───────────────────────────────────────────────────── -->
+        <!-- ── Toolbar / Action Bars ─────────────────────────────────────── -->
         <item name="actionBarStyle">@style/ThemeOverlay.Kanta.Toolbar</item>
         <item name="toolbarStyle">@style/ThemeOverlay.Kanta.Toolbar</item>
 
-        <!-- ── Components ───────────────────────────────────────────────── -->
+        <!-- ── Component Overrides ───────────────────────────────────────── -->
         <item name="alertDialogTheme">@style/KantaAlertDialog</item>
         <item name="materialAlertDialogTheme">@style/KantaAlertDialog</item>
         <item name="materialButtonStyle">@style/KantaButton</item>
         <item name="bottomSheetDialogTheme">@style/KantaBottomSheetDialog</item>
 
-        <!-- ── Ripple ────────────────────────────────────────────────────── -->
-        <item name="colorControlHighlight">#1A2ECC71</item>
-        <item name="rippleColor">@color/ripple_green</item>
+        <!-- ── Interactivity / Touch Feedback ───────────────────────────── -->
+        <item name="colorControlHighlight">@color/ripple_light_black</item>
+        <item name="rippleColor">@color/ripple_light_black</item>
 
     </style>
 

@@ -6,10 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
+    android:clickable="true"
+    android:focusable="true"
     app:cardBackgroundColor="@color/bg_surface"
     app:cardCornerRadius="12dp"
     app:cardElevation="0dp"
-    app:rippleColor="@color/ripple_green"
+    app:rippleColor="@color/ripple_light_black"
     app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -27,6 +29,7 @@
             android:contentDescription="@string/cd_video_thumbnail"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_thumbnail_placeholder"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="H,16:9"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -69,9 +72,11 @@
             android:layout_marginTop="4dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/title"
             app:layout_constraintStart_toStartOf="@id/title"
-            app:layout_constraintTop_toBottomOf="@id/tvChannelName">
+            app:layout_constraintTop_toBottomOf="@id/tvChannelName"
+            app:layout_constraintVertical_bias="0.0">
 
             <ImageView
                 android:id="@+id/ivPlayCount"
@@ -110,13 +115,14 @@
 
         </LinearLayout>
 
+        <!-- More Options Menu Button -->
         <ImageView
             android:id="@+id/btnMenu"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/cd_more_options"
-            android:padding="12dp"
+            android:padding="8dp"
             android:src="@drawable/ic_more_vert"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

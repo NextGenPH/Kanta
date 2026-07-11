@@ -57,7 +57,6 @@ public class PlayerActivity extends AppCompatActivity implements SongAdapter.OnS
     private RecentSongsManager recentSongsManager;
     private GestureDetector gestureDetector;
     private SongAdapter relatedAdapter;
-    private SongAdapter fsRelatedAdapter;
     private android.os.CountDownTimer autoplayTimer;
     private final PlaybackManager.PlaybackCallback playbackCallback = new PlaybackManager.PlaybackCallback() {
         @Override
@@ -271,10 +270,6 @@ public class PlayerActivity extends AppCompatActivity implements SongAdapter.OnS
 
         relatedAdapter = new SongAdapter(this, SongAdapter.Style.VERTICAL_FEED, this, null);
         binding.rvRelatedSongs.setAdapter(relatedAdapter);
-
-        fsRelatedAdapter = new SongAdapter(this, SongAdapter.Style.FULLSCREEN_CARD, this, null);
-        binding.rvFullscreenMoreSongs.setHasFixedSize(true);
-        binding.rvFullscreenMoreSongs.setAdapter(fsRelatedAdapter);
     }
 
     private void setupOverlay() {
@@ -360,7 +355,6 @@ public class PlayerActivity extends AppCompatActivity implements SongAdapter.OnS
 
         viewModel.relatedSongs.observe(this, videos -> {
             relatedAdapter.setSongs(videos);
-            fsRelatedAdapter.setSongs(videos);
             binding.cardRelatedSongs.setVisibility(videos.isEmpty() ? View.GONE : View.VISIBLE);
         });
 
@@ -451,8 +445,6 @@ public class PlayerActivity extends AppCompatActivity implements SongAdapter.OnS
 
         boolean isFs = Objects.requireNonNullElse(viewModel.isFullscreen.getValue(), false);
         if (isFs) {
-            binding.rvFullscreenMoreSongs.setVisibility(View.VISIBLE);
-            binding.rvFullscreenMoreSongs.animate().alpha(1f).setDuration(250).start();
             binding.btnLockControls.setVisibility(View.VISIBLE);
             binding.btnLockControls.animate().alpha(1f).setDuration(250).start();
         }
@@ -475,9 +467,6 @@ public class PlayerActivity extends AppCompatActivity implements SongAdapter.OnS
 
         if (binding.btnLockControls.getVisibility() == View.VISIBLE) {
             binding.btnLockControls.animate().alpha(0f).setDuration(250).start();
-        }
-        if (binding.rvFullscreenMoreSongs.getVisibility() == View.VISIBLE) {
-            binding.rvFullscreenMoreSongs.animate().alpha(0f).setDuration(250).start();
         }
 
         controlsHandler.postDelayed(() -> {
